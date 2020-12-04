@@ -1,0 +1,26 @@
+{
+  "name": "use-menu-website",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Markus Ast <m@rkusa.st>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "10.0.3",
+    "react": "17.0.1",
+    "react-dom": "17.0.1",
+    "tailwindcss": "^2.0.1",
+    "use-menu": "../"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.10",
+    "@types/react": "^17.0.0",
+    "autoprefixer": "^10.0.4",
+    "postcss": "^8.1.14"
+  }
+}
