@@ -88,9 +88,12 @@ describe("Menu Button", () => {
       expect(button.getAttribute("role")).toEqual("button");
     });
 
-    test.todo(
-      "The element with role button has aria-haspopup set to either menu or true."
-    );
+    test("The element with role button has aria-haspopup set to either menu or true.", () => {
+      render(<Menu />);
+      const button = screen.getByRole("button", { name: "Open Dropdown" });
+      expect(button.getAttribute("aria-haspopup")).toEqual("menu");
+    });
+
     test.todo(
       "When the menu is displayed, the element with role button has aria-expanded set to true. When the menu is hidden, it is recommended that aria-expanded is not present. If aria-expanded is specified when the menu is hidden, it is set to false."
     );
