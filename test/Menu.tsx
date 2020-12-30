@@ -8,7 +8,7 @@ export default function Menu() {
       <button {...buttonProps}>Open Dropdown</button>
 
       {isOpen && (
-        <div role="menu" {...menuProps}>
+        <div {...menuProps}>
           <button type="button" role="menuitem">
             Action 1
           </button>

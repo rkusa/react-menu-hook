@@ -106,9 +106,16 @@ describe("Menu Button", () => {
       expect(button.getAttribute("aria-expanded")).toEqual("true");
     });
 
-    test.todo(
-      "The element that contains the menu items displayed by activating the button has role menu."
-    );
+    test("The element that contains the menu items displayed by activating the button has role menu.", () => {
+      render(<Menu />);
+      const button = screen.getByRole("button", { name: "Open Dropdown" });
+
+      userEvent.tab();
+      fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
+
+      expect(screen.getByRole("menu").getAttribute("role")).toEqual("menu");
+    });
+
     test.todo(
       "Optionally, the element with role button has a value specified for aria-controls that refers to the element with role menu."
     );

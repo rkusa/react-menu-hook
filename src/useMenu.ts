@@ -33,6 +33,7 @@ export default function useMenu(): MenuState {
       ),
     },
     menuProps: {
+      role: "menu",
       ref: useCallback(
         (menu: HTMLElement | null) => {
           if (!menu) {
@@ -104,5 +105,6 @@ export interface ButtonProps {
 }
 
 export interface MenuProps {
+  role: "menu";
   ref: RefCallback<HTMLElement | null>;
 }
