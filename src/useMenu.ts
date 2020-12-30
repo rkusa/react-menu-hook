@@ -4,10 +4,15 @@ import {
   useReducer,
   useCallback,
   RefCallback,
+  useMemo,
 } from "react";
 
 export default function useMenu(): MenuState {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
+  const id = useMemo(
+    () => `use-menu-${process.env.NODE_ENV === "test" ? "test" : nextId++}`,
+    []
+  );
 
   return {
     isOpen: state.isOpen,
@@ -15,6 +20,7 @@ export default function useMenu(): MenuState {
       role: "button",
       "aria-haspopup": "menu",
       "aria-expanded": state.isOpen ? "true" : undefined,
+      "aria-controls": id,
       onKeyDown: useCallback(
         (e: KeyboardEvent) => {
           switch (e.code) {
@@ -34,6 +40,7 @@ export default function useMenu(): MenuState {
     },
     menuProps: {
       role: "menu",
+      id,
       ref: useCallback(
         (menu: HTMLElement | null) => {
           if (!menu) {
@@ -62,6 +69,8 @@ export default function useMenu(): MenuState {
     },
   };
 }
+
+let nextId = 1;
 
 interface State {
   isOpen: boolean;
@@ -101,10 +110,12 @@ export interface ButtonProps {
   role: "button";
   "aria-haspopup": "menu";
   "aria-expanded"?: "true";
+  "aria-controls": string;
   onKeyDown: KeyboardEventHandler;
 }
 
 export interface MenuProps {
   role: "menu";
+  id: string;
   ref: RefCallback<HTMLElement | null>;
 }

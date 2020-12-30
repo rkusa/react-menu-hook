@@ -116,8 +116,13 @@ describe("Menu Button", () => {
       expect(screen.getByRole("menu").getAttribute("role")).toEqual("menu");
     });
 
-    test.todo(
-      "Optionally, the element with role button has a value specified for aria-controls that refers to the element with role menu."
-    );
+    test("Optionally, the element with role button has a value specified for aria-controls that refers to the element with role menu.", () => {
+      render(<Menu />);
+      const button = screen.getByRole("button", { name: "Open Dropdown" });
+      expect(button.getAttribute("aria-controls")).toEqual("use-menu-test");
+      userEvent.tab();
+      fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
+      expect(screen.getByRole("menu").id).toEqual("use-menu-test");
+    });
   });
 });
