@@ -37,6 +37,9 @@ describe("Menu Button", () => {
         userEvent.tab();
         fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
         expect(screen.getByRole("menu")).toBeInTheDocument();
+        expect(
+          screen.getByRole("menuitem", { name: "Action 1" })
+        ).toHaveFocus();
       });
 
       test("Space: Opens the menu and places focus on the first menu item.", () => {
@@ -46,14 +49,34 @@ describe("Menu Button", () => {
         userEvent.tab();
         fireEvent.keyDown(button, { key: " ", code: "Space" });
         expect(screen.getByRole("menu")).toBeInTheDocument();
+        expect(
+          screen.getByRole("menuitem", { name: "Action 1" })
+        ).toHaveFocus();
       });
 
-      test.todo(
-        "(Optional) Down Arrow: opens the menu and moves focus to the first menu item."
-      );
-      test.todo(
-        "(Optional) Up Arrow: opens the menu and moves focus to the last menu item."
-      );
+      test("(Optional) Down Arrow: opens the menu and moves focus to the first menu item.", () => {
+        render(<Menu />);
+        const button = screen.getByRole("button", { name: "Open Dropdown" });
+        expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+        userEvent.tab();
+        fireEvent.keyDown(button, { key: "ArrowDown", code: "ArrowDown" });
+        expect(screen.getByRole("menu")).toBeInTheDocument();
+        expect(
+          screen.getByRole("menuitem", { name: "Action 1" })
+        ).toHaveFocus();
+      });
+
+      test("(Optional) Up Arrow: opens the menu and moves focus to the last menu item.", () => {
+        render(<Menu />);
+        const button = screen.getByRole("button", { name: "Open Dropdown" });
+        expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+        userEvent.tab();
+        fireEvent.keyDown(button, { key: "ArrowUp", code: "ArrowUp" });
+        expect(screen.getByRole("menu")).toBeInTheDocument();
+        expect(
+          screen.getByRole("menuitem", { name: "Action 3" })
+        ).toHaveFocus();
+      });
     });
   });
 
