@@ -14,6 +14,7 @@ export default function useMenu(): MenuState {
     buttonProps: {
       role: "button",
       "aria-haspopup": "menu",
+      "aria-expanded": state.isOpen ? "true" : undefined,
       onKeyDown: useCallback(
         (e: KeyboardEvent) => {
           switch (e.code) {
@@ -98,6 +99,7 @@ export interface MenuState {
 export interface ButtonProps {
   role: "button";
   "aria-haspopup": "menu";
+  "aria-expanded"?: "true";
   onKeyDown: KeyboardEventHandler;
 }
 

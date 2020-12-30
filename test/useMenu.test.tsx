@@ -94,9 +94,18 @@ describe("Menu Button", () => {
       expect(button.getAttribute("aria-haspopup")).toEqual("menu");
     });
 
-    test.todo(
-      "When the menu is displayed, the element with role button has aria-expanded set to true. When the menu is hidden, it is recommended that aria-expanded is not present. If aria-expanded is specified when the menu is hidden, it is set to false."
-    );
+    test("When the menu is displayed, the element with role button has aria-expanded set to true. When the menu is hidden, it is recommended that aria-expanded is not present. If aria-expanded is specified when the menu is hidden, it is set to false.", () => {
+      render(<Menu />);
+      const button = screen.getByRole("button", { name: "Open Dropdown" });
+      expect(button.hasAttribute("aria-expanded")).toEqual(false);
+
+      userEvent.tab();
+      fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
+
+      expect(screen.getByRole("menu")).toBeInTheDocument();
+      expect(button.getAttribute("aria-expanded")).toEqual("true");
+    });
+
     test.todo(
       "The element that contains the menu items displayed by activating the button has role menu."
     );
