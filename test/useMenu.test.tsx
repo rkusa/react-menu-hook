@@ -82,7 +82,12 @@ describe("Menu Button", () => {
 
   // https://www.w3.org/TR/wai-aria-practices-1.2/#wai-aria-roles-states-and-properties-14
   describe("WAI-ARIA Roles, States, and Properties", () => {
-    test.todo("The element that opens the menu has role button.");
+    test("The element that opens the menu has role button.", () => {
+      render(<Menu />);
+      const button = screen.getByRole("button", { name: "Open Dropdown" });
+      expect(button.getAttribute("role")).toEqual("button");
+    });
+
     test.todo(
       "The element with role button has aria-haspopup set to either menu or true."
     );

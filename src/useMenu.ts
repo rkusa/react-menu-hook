@@ -12,6 +12,7 @@ export default function useMenu(): MenuState {
   return {
     isOpen: state.isOpen,
     buttonProps: {
+      role: "button",
       onKeyDown: useCallback(
         (e: KeyboardEvent) => {
           switch (e.code) {
@@ -94,6 +95,7 @@ export interface MenuState {
 }
 
 export interface ButtonProps {
+  role: "button";
   onKeyDown: KeyboardEventHandler;
 }
 
