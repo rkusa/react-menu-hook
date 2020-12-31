@@ -2,7 +2,7 @@
 // https://www.w3.org/TR/wai-aria-practices-1.2/#menu
 // https://www.w3.org/TR/wai-aria-practices-1.2/#menubutton
 
-import React from "react";
+import React, { MouseEvent } from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import Menu from "./Menu";
 import "@testing-library/jest-dom";
@@ -154,9 +154,18 @@ describe("Menu", () => {
       test.todo(
         "When focus is on a menuitemradio, toggles the item and closes the menu"
       );
-      test.todo(
-        "When focus is on a menuitem, activates the item and closes the menu"
-      );
+
+      test("When focus is on a menuitem, activates the item and closes the menu", () => {
+        const handleAction1 = jest.fn();
+        render(<Menu onAction1={handleAction1} />);
+        const button = screen.getByRole("button", { name: "Open Dropdown" });
+        userEvent.tab();
+        fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
+        const action1 = screen.getByRole("menuitem", { name: "Action 1" });
+        fireEvent.keyDown(action1, { key: "Enter", code: "Enter" });
+        expect(handleAction1).toHaveBeenCalledTimes(1);
+        expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+      });
     });
 
     describe("Space", () => {
@@ -166,9 +175,18 @@ describe("Menu", () => {
       test.todo(
         "When focus is on a menuitemradio that is not checked, without closing the menu, checks the focused menuitemradio and unchecks any other checked menuitemradio element in the same group"
       );
-      test.todo(
-        "When focus is on a menuitem, activates the menuitem and closes the menu"
-      );
+
+      test("When focus is on a menuitem, activates the menuitem and closes the menu", () => {
+        const handleAction1 = jest.fn();
+        render(<Menu onAction1={handleAction1} />);
+        const button = screen.getByRole("button", { name: "Open Dropdown" });
+        userEvent.tab();
+        fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
+        const action1 = screen.getByRole("menuitem", { name: "Action 1" });
+        fireEvent.keyDown(action1, { key: "Space", code: "Space" });
+        expect(handleAction1).toHaveBeenCalledTimes(1);
+        expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+      });
     });
 
     describe("Down Arrow", () => {
@@ -241,13 +259,17 @@ describe("Menu item", () => {
       const second = jest.fn();
 
       act(() => {
-        result.current.getItemProps(first).onClick();
+        result.current
+          .getItemProps(first)
+          .onClick(({} as unknown) as MouseEvent);
       });
 
       rerender();
 
       act(() => {
-        result.current.getItemProps(second).onClick();
+        result.current
+          .getItemProps(second)
+          .onClick(({} as unknown) as MouseEvent);
       });
 
       expect(first).toHaveBeenCalledTimes(1);
@@ -261,14 +283,18 @@ describe("Menu item", () => {
       const third = jest.fn();
 
       act(() => {
-        result.current.getItemProps(first, [1]).onClick();
+        result.current
+          .getItemProps(first, [1])
+          .onClick(({} as unknown) as MouseEvent);
       });
 
       expect(first).toHaveBeenCalledTimes(1);
       rerender();
 
       act(() => {
-        result.current.getItemProps(second, [1]).onClick();
+        result.current
+          .getItemProps(second, [1])
+          .onClick(({} as unknown) as MouseEvent);
       });
 
       expect(first).toHaveBeenCalledTimes(2);
@@ -276,7 +302,9 @@ describe("Menu item", () => {
       rerender();
 
       act(() => {
-        result.current.getItemProps(third, [1, {}]).onClick();
+        result.current
+          .getItemProps(third, [1, {}])
+          .onClick(({} as unknown) as MouseEvent);
       });
 
       expect(first).toHaveBeenCalledTimes(2);
@@ -290,15 +318,23 @@ describe("Menu item", () => {
       const second = jest.fn();
 
       act(() => {
-        result.current.getItemProps(first, [1]).onClick();
-        result.current.getItemProps(second, [2]).onClick();
+        result.current
+          .getItemProps(first, [1])
+          .onClick(({} as unknown) as MouseEvent);
+        result.current
+          .getItemProps(second, [2])
+          .onClick(({} as unknown) as MouseEvent);
       });
 
       rerender();
 
       act(() => {
-        result.current.getItemProps(jest.fn(), [1]).onClick();
-        result.current.getItemProps(jest.fn(), [2]).onClick();
+        result.current
+          .getItemProps(jest.fn(), [1])
+          .onClick(({} as unknown) as MouseEvent);
+        result.current
+          .getItemProps(jest.fn(), [2])
+          .onClick(({} as unknown) as MouseEvent);
       });
 
       expect(first).toHaveBeenCalledTimes(2);

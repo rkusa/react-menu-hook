@@ -16,8 +16,10 @@ export default function useMenu(): MenuState {
     () => `use-menu-${process.env.NODE_ENV === "test" ? "test" : nextId++}`,
     []
   );
-  let itemClickHandlerIndex = 0;
-  const itemClickHandlers = useRef<Array<[() => void, DependencyList]>>([]);
+  let itemEventHandlerIndex = 0;
+  const itemEventHandlers = useRef<
+    Array<[MouseEventHandler, KeyboardEventHandler, DependencyList]>
+  >([]);
 
   return {
     isOpen: state.isOpen,
@@ -77,13 +79,14 @@ export default function useMenu(): MenuState {
     },
 
     getItemProps(callback?: () => void, deps?: DependencyList) {
-      const memorized = itemClickHandlers.current[itemClickHandlerIndex];
-      let onClick;
+      const memorized = itemEventHandlers.current[itemEventHandlerIndex];
+      let onClick, onKeyDown;
 
       if (memorized && deps) {
-        const [previousOnClick, previousDeps] = memorized;
+        const [previousOnClick, previousOnKeyDown, previousDeps] = memorized;
         if (shallowEqual(deps, previousDeps)) {
           onClick = previousOnClick;
+          onKeyDown = previousOnKeyDown;
         }
       }
 
@@ -93,16 +96,30 @@ export default function useMenu(): MenuState {
           callback?.();
           dispatch({ type: "close" });
         });
-      itemClickHandlers.current[itemClickHandlerIndex] = [
+      onKeyDown =
+        onKeyDown ??
+        ((e: KeyboardEvent) => {
+          switch (e.code) {
+            case "Enter":
+            case "Space":
+              callback?.();
+              dispatch({ type: "close" });
+              break;
+          }
+        });
+
+      itemEventHandlers.current[itemEventHandlerIndex] = [
         onClick,
+        onKeyDown,
         deps ? deps.slice() : [],
       ];
-      itemClickHandlerIndex++;
+      itemEventHandlerIndex++;
 
       return {
         role: "menuitem",
         tabIndex: -1,
         onClick,
+        onKeyDown,
       };
     },
   };
@@ -176,5 +193,6 @@ export interface MenuProps {
 export interface ItemProps {
   role: "menuitem";
   tabIndex: -1;
-  onClick(): void;
+  onClick: MouseEventHandler;
+  onKeyDown: KeyboardEventHandler;
 }
