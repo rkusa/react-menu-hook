@@ -5,7 +5,8 @@ import {
   useCallback,
   RefCallback,
   useMemo,
-  MouseEventHandler,
+  useRef,
+  DependencyList,
 } from "react";
 
 export default function useMenu(): MenuState {
@@ -14,6 +15,8 @@ export default function useMenu(): MenuState {
     () => `use-menu-${process.env.NODE_ENV === "test" ? "test" : nextId++}`,
     []
   );
+  let itemClickHandlerIndex = 0;
+  const itemClickHandlers = useRef<Array<[() => void, DependencyList]>>([]);
 
   return {
     isOpen: state.isOpen,
@@ -69,18 +72,43 @@ export default function useMenu(): MenuState {
       ),
     },
 
-    getItemProps(callback: () => void) {
-      // TODO: memorize
+    getItemProps(callback: () => void, deps?: DependencyList) {
+      const memorized = itemClickHandlers.current[itemClickHandlerIndex];
+      let onClick;
+
+      if (memorized && deps) {
+        const [previousOnClick, previousDeps] = memorized;
+        if (shallowEqual(deps, previousDeps)) {
+          onClick = previousOnClick;
+        }
+      }
+
+      onClick = onClick ?? (() => callback());
+      itemClickHandlers.current[itemClickHandlerIndex] = [
+        onClick,
+        deps ? deps.slice() : [],
+      ];
+      itemClickHandlerIndex++;
 
       return {
         role: "menuitem",
         tabIndex: -1,
-        onClick() {
-          callback();
-        },
+        onClick,
       };
     },
   };
+}
+
+function shallowEqual(lhs: DependencyList, rhs: DependencyList): boolean {
+  if (lhs.length !== rhs.length) {
+    return false;
+  }
+  for (let i = 0; i < lhs.length; ++i) {
+    if (lhs[i] !== rhs[i]) {
+      return false;
+    }
+  }
+  return true;
 }
 
 let nextId = 1;
@@ -117,7 +145,7 @@ export interface MenuState {
   isOpen: boolean;
   buttonProps: ButtonProps;
   menuProps: MenuProps;
-  getItemProps(callback: () => void): ItemProps;
+  getItemProps(callback: () => void, deps?: DependencyList): ItemProps;
 }
 
 export interface ButtonProps {
@@ -137,5 +165,5 @@ export interface MenuProps {
 export interface ItemProps {
   role: "menuitem";
   tabIndex: -1;
-  onClick: MouseEventHandler;
+  onClick(): void;
 }

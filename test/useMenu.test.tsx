@@ -7,6 +7,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import Menu from "./Menu";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
+import useMenu from "../src";
+import { renderHook } from "@testing-library/react-hooks";
 
 describe("Menu Button", () => {
   test("focus menu button", () => {
@@ -205,5 +207,64 @@ describe("Menu", () => {
     test.todo(
       "The menu has aria-labelledby set to a value that refers to the button that controls its display"
     );
+  });
+});
+
+describe("Menu item", () => {
+  describe("memoize onClick", () => {
+    test("don't memoize if no deps list is provided", () => {
+      const { result, rerender } = renderHook(() => useMenu());
+      const first = jest.fn();
+      const second = jest.fn();
+
+      result.current.getItemProps(first).onClick();
+
+      rerender();
+
+      result.current.getItemProps(second).onClick();
+
+      expect(first).toHaveBeenCalledTimes(1);
+      expect(second).toHaveBeenCalledTimes(1);
+    });
+
+    test("memoize until deps change", () => {
+      const { result, rerender } = renderHook(() => useMenu());
+      const first = jest.fn();
+      const second = jest.fn();
+      const third = jest.fn();
+
+      result.current.getItemProps(first, [1]).onClick();
+
+      expect(first).toHaveBeenCalledTimes(1);
+      rerender();
+
+      result.current.getItemProps(second, [1]).onClick();
+
+      expect(first).toHaveBeenCalledTimes(2);
+      expect(second).toHaveBeenCalledTimes(0);
+      rerender();
+
+      result.current.getItemProps(third, [1, {}]).onClick();
+
+      expect(first).toHaveBeenCalledTimes(2);
+      expect(second).toHaveBeenCalledTimes(0);
+      expect(third).toHaveBeenCalledTimes(1);
+    });
+
+    test("memoize for multiple menu items", () => {
+      const { result, rerender } = renderHook(() => useMenu());
+      const first = jest.fn();
+      const second = jest.fn();
+
+      result.current.getItemProps(first, [1]).onClick();
+      result.current.getItemProps(second, [2]).onClick();
+
+      rerender();
+      result.current.getItemProps(jest.fn(), [1]).onClick();
+      result.current.getItemProps(jest.fn(), [2]).onClick();
+
+      expect(first).toHaveBeenCalledTimes(2);
+      expect(second).toHaveBeenCalledTimes(2);
+    });
   });
 });
