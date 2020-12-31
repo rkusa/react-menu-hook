@@ -2,23 +2,17 @@ import React from "react";
 import useMenu from "../src";
 
 export default function Menu() {
-  const { isOpen, buttonProps, menuProps } = useMenu();
+  const { isOpen, buttonProps, menuProps, getItemProps } = useMenu();
   return (
     <div>
       <button {...buttonProps}>Open Dropdown</button>
 
       {isOpen && (
-        <div {...menuProps}>
-          <button type="button" role="menuitem">
-            Action 1
-          </button>
-          <button type="button" role="menuitem">
-            Action 2
-          </button>
-          <button type="button" role="menuitem">
-            Action 3
-          </button>
-        </div>
+        <ul {...menuProps}>
+          <li {...getItemProps(() => {})}>Action 1</li>
+          <li {...getItemProps(() => {})}>Action 2</li>
+          <li {...getItemProps(() => {})}>Action 3</li>
+        </ul>
       )}
     </div>
   );

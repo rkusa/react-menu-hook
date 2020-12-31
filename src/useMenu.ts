@@ -5,6 +5,7 @@ import {
   useCallback,
   RefCallback,
   useMemo,
+  MouseEventHandler,
 } from "react";
 
 export default function useMenu(): MenuState {
@@ -67,6 +68,18 @@ export default function useMenu(): MenuState {
         [state.pendingFocus]
       ),
     },
+
+    getItemProps(callback: () => void) {
+      // TODO: memorize
+
+      return {
+        role: "menuitem",
+        tabIndex: -1,
+        onClick() {
+          callback();
+        },
+      };
+    },
   };
 }
 
@@ -104,6 +117,7 @@ export interface MenuState {
   isOpen: boolean;
   buttonProps: ButtonProps;
   menuProps: MenuProps;
+  getItemProps(callback: () => void): ItemProps;
 }
 
 export interface ButtonProps {
@@ -118,4 +132,10 @@ export interface MenuProps {
   role: "menu";
   id: string;
   ref: RefCallback<HTMLElement | null>;
+}
+
+export interface ItemProps {
+  role: "menuitem";
+  tabIndex: -1;
+  onClick: MouseEventHandler;
 }

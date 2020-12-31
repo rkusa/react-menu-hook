@@ -8,17 +8,6 @@ import Menu from "./Menu";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
-// it("should render menu", () => {
-//   render(<Menu />);
-//   expect(screen.getByRole("menu")).toBeInTheDocument();
-//   expect(
-//     screen.getByRole("menuitem", { name: "Action 1" })
-//   ).toBeInTheDocument();
-//   expect(
-//     screen.getByRole("menuitem", { name: "Action 2" })
-//   ).toBeInTheDocument();
-// });
-
 describe("Menu Button", () => {
   test("focus menu button", () => {
     render(<Menu />);
@@ -191,7 +180,21 @@ describe("Menu", () => {
     test.todo(
       "The items contained in a menu are child elements of the containing menu and have any of the following roles: menuitem, menuitemcheckbox, menuitemradio"
     );
-    test.todo("Each item in the menu has tabindex set to -1");
+
+    test("Each item in the menu has tabindex set to -1", () => {
+      render(<Menu />);
+      const button = screen.getByRole("button", { name: "Open Dropdown" });
+      expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+      userEvent.tab();
+      fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
+
+      const items = screen.getAllByRole("menuitem");
+      expect(items).toHaveLength(3);
+      for (const item of items) {
+        expect(item.tabIndex).toEqual(-1);
+      }
+    });
+
     test.todo(
       "When a menuitemcheckbox or menuitemradio is checked, aria-checked is set to true"
     );
