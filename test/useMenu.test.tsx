@@ -200,9 +200,17 @@ describe("Menu", () => {
     });
 
     describe("Escape", () => {
-      test.todo(
-        "Close the menu that contains focus and return focus to the menu button from which the menu was opened"
-      );
+      test("Close the menu that contains focus and return focus to the menu button from which the menu was opened", () => {
+        const handleAction1 = jest.fn();
+        render(<Menu onAction1={handleAction1} />);
+        const button = screen.getByRole("button", { name: "Open Dropdown" });
+        userEvent.tab();
+        fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
+        const action1 = screen.getByRole("menuitem", { name: "Action 1" });
+        fireEvent.keyDown(action1, { key: "Escape", code: "Escape" });
+        expect(handleAction1).not.toHaveBeenCalled();
+        expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+      });
     });
 
     describe("Tab", () => {

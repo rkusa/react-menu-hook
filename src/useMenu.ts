@@ -76,6 +76,16 @@ export default function useMenu(): MenuState {
         },
         [state.pendingFocus]
       ),
+      onKeyDown: useCallback(
+        (e: KeyboardEvent) => {
+          switch (e.code) {
+            case "Escape":
+              dispatch({ type: "close" });
+              break;
+          }
+        },
+        [dispatch]
+      ),
     },
 
     getItemProps(callback?: () => void, deps?: DependencyList) {
@@ -188,6 +198,7 @@ export interface MenuProps {
   role: "menu";
   id: string;
   ref: RefCallback<HTMLElement | null>;
+  onKeyDown: KeyboardEventHandler;
 }
 
 export interface ItemProps {
