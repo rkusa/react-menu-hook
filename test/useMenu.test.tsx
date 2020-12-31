@@ -24,6 +24,7 @@ describe("Menu Button", () => {
       const button = screen.getByRole("button", { name: "Open Dropdown" });
       userEvent.click(button);
       expect(screen.getByRole("menu")).toBeInTheDocument();
+      expect(button).toHaveFocus();
     });
   });
 
@@ -214,13 +215,77 @@ describe("Menu", () => {
     });
 
     describe("Tab", () => {
-      test.todo("Moves focus to the next element in the tab sequence");
-      test.todo("Closes the menu if element outside of the menu got focused");
+      test("Moves focus to the next element in the tab sequence", () => {
+        render(
+          <>
+            <Menu />
+            <button type="submit">outside</button>
+          </>
+        );
+        const button = screen.getByRole("button", { name: "Open Dropdown" });
+        userEvent.click(button);
+        expect(button).toHaveFocus();
+
+        userEvent.tab();
+        expect(screen.getByRole("button", { name: "outside" })).toHaveFocus();
+      });
+
+      test("Closes the menu if element outside of the menu got focused", async () => {
+        render(<Menu />);
+        const button = screen.getByRole("button", { name: "Open Dropdown" });
+
+        userEvent.tab();
+        fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
+        userEvent.tab();
+        expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+      });
+
+      test("Closes the menu if focused is moved away from menu button", async () => {
+        render(<Menu />);
+        const button = screen.getByRole("button", { name: "Open Dropdown" });
+
+        userEvent.click(button);
+        expect(button).toHaveFocus();
+        userEvent.tab();
+        expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+      });
     });
 
     describe("Shift + Tab", () => {
-      test.todo("Moves focus to the previous element in the tab sequence");
-      test.todo("Closes the menu if element outside of the menu got focused");
+      test("Moves focus to the previous element in the tab sequence", () => {
+        render(
+          <>
+            <button type="submit">outside</button>
+            <Menu />
+          </>
+        );
+        const button = screen.getByRole("button", { name: "Open Dropdown" });
+        userEvent.click(button);
+        expect(button).toHaveFocus();
+
+        userEvent.tab({ shift: true });
+        expect(screen.getByRole("button", { name: "outside" })).toHaveFocus();
+      });
+
+      test("Closes the menu if element outside of the menu got focused", async () => {
+        render(<Menu />);
+        const button = screen.getByRole("button", { name: "Open Dropdown" });
+
+        userEvent.tab();
+        fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
+        userEvent.tab({ shift: true });
+        expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+      });
+
+      test("Closes the menu if focused is moved away from menu button", async () => {
+        render(<Menu />);
+        const button = screen.getByRole("button", { name: "Open Dropdown" });
+
+        userEvent.click(button);
+        expect(button).toHaveFocus();
+        userEvent.tab({ shift: true });
+        expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+      });
     });
 
     test.todo("Disabled menu items are focusable but cannot be activated");

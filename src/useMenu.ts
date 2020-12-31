@@ -3,11 +3,12 @@ import {
   KeyboardEventHandler,
   useReducer,
   useCallback,
-  RefCallback,
   useMemo,
   useRef,
   DependencyList,
   MouseEventHandler,
+  FocusEventHandler,
+  RefCallback,
 } from "react";
 
 export default function useMenu(): MenuState {
@@ -47,6 +48,13 @@ export default function useMenu(): MenuState {
         },
         [dispatch]
       ),
+      onBlur: useCallback(() => {
+        // Close the menu, unless something inside the menu is focused
+        if (state.pendingFocus === null) {
+          // console.log(document.activeElement);
+          dispatch({ type: "close" });
+        }
+      }, [dispatch, state.pendingFocus]),
     },
     menuProps: {
       role: "menu",
@@ -86,6 +94,9 @@ export default function useMenu(): MenuState {
         },
         [dispatch]
       ),
+      onBlur: useCallback(() => {
+        dispatch({ type: "close" });
+      }, [dispatch]),
     },
 
     getItemProps(callback?: () => void, deps?: DependencyList) {
@@ -192,6 +203,7 @@ export interface ButtonProps {
   "aria-controls": string;
   onClick: MouseEventHandler;
   onKeyDown: KeyboardEventHandler;
+  onBlur: FocusEventHandler;
 }
 
 export interface MenuProps {
@@ -199,6 +211,7 @@ export interface MenuProps {
   id: string;
   ref: RefCallback<HTMLElement | null>;
   onKeyDown: KeyboardEventHandler;
+  onBlur: FocusEventHandler;
 }
 
 export interface ItemProps {
