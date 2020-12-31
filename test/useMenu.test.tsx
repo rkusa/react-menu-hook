@@ -8,7 +8,7 @@ import Menu from "./Menu";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import useMenu from "../src";
-import { renderHook } from "@testing-library/react-hooks";
+import { renderHook, act } from "@testing-library/react-hooks";
 
 describe("Menu Button", () => {
   test("focus menu button", () => {
@@ -16,6 +16,15 @@ describe("Menu Button", () => {
     const button = screen.getByRole("button", { name: "Open Dropdown" });
     userEvent.tab();
     expect(document.activeElement).toEqual(button);
+  });
+
+  describe("Mouse Interaction", () => {
+    test("Clicking the button opens the menu", () => {
+      render(<Menu />);
+      const button = screen.getByRole("button", { name: "Open Dropdown" });
+      userEvent.click(button);
+      expect(screen.getByRole("menu")).toBeInTheDocument();
+    });
   });
 
   // https://www.w3.org/TR/wai-aria-practices-1.2/#keyboard-interaction-13
@@ -122,6 +131,20 @@ describe("Menu Button", () => {
 // The following tests ignore everything related to horizontal menus and submenus, it only assums
 // vertical one-level menus (for now).
 describe("Menu", () => {
+  describe("Mouse Interaction", () => {
+    test("Clicking a menuitem activates it and closes the menu", async () => {
+      const handleAction1 = jest.fn();
+      render(<Menu onAction1={handleAction1} />);
+      const button = screen.getByRole("button", { name: "Open Dropdown" });
+      userEvent.tab();
+      fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
+      const action1 = screen.getByRole("menuitem", { name: "Action 1" });
+      userEvent.click(action1);
+      expect(handleAction1).toHaveBeenCalledTimes(1);
+      expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    });
+  });
+
   // https://www.w3.org/TR/wai-aria-practices-1.2/#keyboard-interaction-12
   describe("Keyboard Interaction", () => {
     describe("Enter", () => {
@@ -217,11 +240,15 @@ describe("Menu item", () => {
       const first = jest.fn();
       const second = jest.fn();
 
-      result.current.getItemProps(first).onClick();
+      act(() => {
+        result.current.getItemProps(first).onClick();
+      });
 
       rerender();
 
-      result.current.getItemProps(second).onClick();
+      act(() => {
+        result.current.getItemProps(second).onClick();
+      });
 
       expect(first).toHaveBeenCalledTimes(1);
       expect(second).toHaveBeenCalledTimes(1);
@@ -233,18 +260,24 @@ describe("Menu item", () => {
       const second = jest.fn();
       const third = jest.fn();
 
-      result.current.getItemProps(first, [1]).onClick();
+      act(() => {
+        result.current.getItemProps(first, [1]).onClick();
+      });
 
       expect(first).toHaveBeenCalledTimes(1);
       rerender();
 
-      result.current.getItemProps(second, [1]).onClick();
+      act(() => {
+        result.current.getItemProps(second, [1]).onClick();
+      });
 
       expect(first).toHaveBeenCalledTimes(2);
       expect(second).toHaveBeenCalledTimes(0);
       rerender();
 
-      result.current.getItemProps(third, [1, {}]).onClick();
+      act(() => {
+        result.current.getItemProps(third, [1, {}]).onClick();
+      });
 
       expect(first).toHaveBeenCalledTimes(2);
       expect(second).toHaveBeenCalledTimes(0);
@@ -256,12 +289,17 @@ describe("Menu item", () => {
       const first = jest.fn();
       const second = jest.fn();
 
-      result.current.getItemProps(first, [1]).onClick();
-      result.current.getItemProps(second, [2]).onClick();
+      act(() => {
+        result.current.getItemProps(first, [1]).onClick();
+        result.current.getItemProps(second, [2]).onClick();
+      });
 
       rerender();
-      result.current.getItemProps(jest.fn(), [1]).onClick();
-      result.current.getItemProps(jest.fn(), [2]).onClick();
+
+      act(() => {
+        result.current.getItemProps(jest.fn(), [1]).onClick();
+        result.current.getItemProps(jest.fn(), [2]).onClick();
+      });
 
       expect(first).toHaveBeenCalledTimes(2);
       expect(second).toHaveBeenCalledTimes(2);

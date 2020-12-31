@@ -7,6 +7,7 @@ import {
   useMemo,
   useRef,
   DependencyList,
+  MouseEventHandler,
 } from "react";
 
 export default function useMenu(): MenuState {
@@ -25,17 +26,20 @@ export default function useMenu(): MenuState {
       "aria-haspopup": "menu",
       "aria-expanded": state.isOpen ? "true" : undefined,
       "aria-controls": id,
+      onClick: useCallback(() => {
+        dispatch({ type: "open" });
+      }, [dispatch]),
       onKeyDown: useCallback(
         (e: KeyboardEvent) => {
           switch (e.code) {
             case "Enter":
             case "Space":
             case "ArrowDown":
-              dispatch({ type: "openFocusFirst" });
+              dispatch({ type: "open", focus: "first" });
               break;
 
             case "ArrowUp":
-              dispatch({ type: "openFocusLast" });
+              dispatch({ type: "open", focus: "last" });
               break;
           }
         },
@@ -72,7 +76,7 @@ export default function useMenu(): MenuState {
       ),
     },
 
-    getItemProps(callback: () => void, deps?: DependencyList) {
+    getItemProps(callback?: () => void, deps?: DependencyList) {
       const memorized = itemClickHandlers.current[itemClickHandlerIndex];
       let onClick;
 
@@ -83,7 +87,12 @@ export default function useMenu(): MenuState {
         }
       }
 
-      onClick = onClick ?? (() => callback());
+      onClick =
+        onClick ??
+        (() => {
+          callback?.();
+          dispatch({ type: "close" });
+        });
       itemClickHandlers.current[itemClickHandlerIndex] = [
         onClick,
         deps ? deps.slice() : [],
@@ -118,24 +127,25 @@ interface State {
   pendingFocus: "first" | "last" | null;
 }
 
-interface ActionOpenFocusFirst {
-  type: "openFocusFirst";
+interface ActionOpen {
+  type: "open";
+  focus?: "first" | "last";
 }
 
-interface ActionOpenFocusLast {
-  type: "openFocusLast";
+interface ActionClose {
+  type: "close";
 }
 
-type Action = ActionOpenFocusFirst | ActionOpenFocusLast;
+type Action = ActionOpen | ActionClose;
 
 const INITIAL_STATE: State = { isOpen: false, pendingFocus: null };
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
-    case "openFocusFirst":
-      return { isOpen: true, pendingFocus: "first" };
-    case "openFocusLast":
-      return { isOpen: true, pendingFocus: "last" };
+    case "open":
+      return { isOpen: true, pendingFocus: action.focus ?? null };
+    case "close":
+      return { isOpen: false, pendingFocus: null };
     default:
       return state;
   }
@@ -145,7 +155,7 @@ export interface MenuState {
   isOpen: boolean;
   buttonProps: ButtonProps;
   menuProps: MenuProps;
-  getItemProps(callback: () => void, deps?: DependencyList): ItemProps;
+  getItemProps(callback?: () => void, deps?: DependencyList): ItemProps;
 }
 
 export interface ButtonProps {
@@ -153,6 +163,7 @@ export interface ButtonProps {
   "aria-haspopup": "menu";
   "aria-expanded"?: "true";
   "aria-controls": string;
+  onClick: MouseEventHandler;
   onKeyDown: KeyboardEventHandler;
 }
 
