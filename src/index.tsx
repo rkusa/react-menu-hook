@@ -1,2 +1,4 @@
-import useMenu from './useMenu'
-export default useMenu
+import useMenu from "./useMenu";
+import useMenuCheckboxState from "./useMenuCheckboxState";
+
+export { useMenu, useMenuCheckboxState };

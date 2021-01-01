@@ -18,10 +18,7 @@ export default function useMenu(): MenuState {
     const id = process.env.NODE_ENV === "test" ? "test" : nextId++;
     return [`use-menu-${id}`, `use-menu-${id}-trigger`];
   }, []);
-  let itemEventHandlerIndex = 0;
-  const itemEventHandlers = useRef<
-    Array<[MouseEventHandler, KeyboardEventHandler, DependencyList]>
-  >([]);
+  const { nextMemoizedHandlers } = useMemoizedEventHandlers();
 
   return {
     isOpen: state.isOpen,
@@ -50,12 +47,20 @@ export default function useMenu(): MenuState {
         },
         [dispatch]
       ),
-      onBlur: useCallback(() => {
-        // Close the menu, unless something inside the menu is focused
-        if (state.pendingFocus === null) {
-          dispatch({ type: "close" });
-        }
-      }, [dispatch, state.pendingFocus]),
+      onBlur: useCallback(
+        (e: FocusEvent) => {
+          // Close the menu, unless something inside the menu is focused
+          const menu = document.getElementById(menuId);
+          if (
+            !menu ||
+            !e.relatedTarget ||
+            !menu.contains(e.relatedTarget as Node)
+          ) {
+            dispatch({ type: "close" });
+          }
+        },
+        [dispatch, menuId]
+      ),
     },
     menuProps: {
       role: "menu",
@@ -137,27 +142,13 @@ export default function useMenu(): MenuState {
       ),
     },
 
-    getItemProps(callback?: () => void, deps?: DependencyList) {
-      const memorized = itemEventHandlers.current[itemEventHandlerIndex];
-      let onClick, onKeyDown;
-
-      if (memorized && deps) {
-        const [previousOnClick, previousOnKeyDown, previousDeps] = memorized;
-        if (shallowEqual(deps, previousDeps)) {
-          onClick = previousOnClick;
-          onKeyDown = previousOnKeyDown;
-        }
-      }
-
-      onClick =
-        onClick ??
-        (() => {
+    getItemProps(callback?: () => void, deps?: DependencyList): ItemProps {
+      const [onClick, onKeyDown] = nextMemoizedHandlers(
+        () => {
           callback?.();
           dispatch({ type: "close" });
-        });
-      onKeyDown =
-        onKeyDown ??
-        ((e: KeyboardEvent) => {
+        },
+        (e: KeyboardEvent) => {
           switch (e.code) {
             case "Enter":
             case "Space":
@@ -165,18 +156,38 @@ export default function useMenu(): MenuState {
               dispatch({ type: "close" });
               break;
           }
-        });
-
-      itemEventHandlers.current[itemEventHandlerIndex] = [
-        onClick,
-        onKeyDown,
-        deps ? deps.slice() : [],
-      ];
-      itemEventHandlerIndex++;
+        },
+        deps
+      );
 
       return {
         role: "menuitem",
         tabIndex: -1,
+        onClick,
+        onKeyDown,
+      };
+    },
+
+    getItemCheckboxProps(opts: ItemCheckboxOptions): ItemCheckboxProps {
+      const [onClick, onKeyDown] = nextMemoizedHandlers(
+        () => {
+          opts.onToggle();
+        },
+        (e: KeyboardEvent) => {
+          switch (e.code) {
+            case "Enter":
+            case "Space":
+              opts.onToggle();
+              break;
+          }
+        },
+        [opts.onToggle]
+      );
+
+      return {
+        role: "menuitemcheckbox",
+        tabIndex: -1,
+        "aria-checked": opts.checked,
         onClick,
         onKeyDown,
       };
@@ -228,11 +239,50 @@ function reducer(_state: State, action: Action): State {
   }
 }
 
+function useMemoizedEventHandlers() {
+  let itemEventHandlerIndex = 0;
+  const itemEventHandlers = useRef<
+    Array<[MouseEventHandler, KeyboardEventHandler, DependencyList]>
+  >([]);
+
+  return {
+    nextMemoizedHandlers(
+      defaultOnClick: MouseEventHandler,
+      defaultOnKeyDown: KeyboardEventHandler,
+      deps?: DependencyList
+    ): [MouseEventHandler, KeyboardEventHandler] {
+      const memorized = itemEventHandlers.current[itemEventHandlerIndex];
+      let onClick, onKeyDown;
+
+      if (memorized && deps) {
+        const [previousOnClick, previousOnKeyDown, previousDeps] = memorized;
+        if (shallowEqual(deps, previousDeps)) {
+          onClick = previousOnClick;
+          onKeyDown = previousOnKeyDown;
+        }
+      }
+
+      onClick = onClick ?? defaultOnClick;
+      onKeyDown = onKeyDown ?? defaultOnKeyDown;
+
+      itemEventHandlers.current[itemEventHandlerIndex] = [
+        onClick,
+        onKeyDown,
+        deps ? deps.slice() : [],
+      ];
+      itemEventHandlerIndex++;
+
+      return [onClick, onKeyDown];
+    },
+  };
+}
+
 export interface MenuState {
   isOpen: boolean;
   buttonProps: ButtonProps;
   menuProps: MenuProps;
   getItemProps(callback?: () => void, deps?: DependencyList): ItemProps;
+  getItemCheckboxProps(opts: ItemCheckboxOptions): ItemCheckboxProps;
 }
 
 export interface ButtonProps {
@@ -258,6 +308,19 @@ export interface MenuProps {
 export interface ItemProps {
   role: "menuitem";
   tabIndex: -1;
+  onClick: MouseEventHandler;
+  onKeyDown: KeyboardEventHandler;
+}
+
+export interface ItemCheckboxOptions {
+  checked: boolean;
+  onToggle(): void;
+}
+
+export interface ItemCheckboxProps {
+  role: "menuitemcheckbox";
+  tabIndex: -1;
+  "aria-checked": boolean;
   onClick: MouseEventHandler;
   onKeyDown: KeyboardEventHandler;
 }

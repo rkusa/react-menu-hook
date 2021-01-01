@@ -7,7 +7,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import Menu from "./Menu";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
-import useMenu from "../src";
+import { useMenu } from "../src";
 import { renderHook, act } from "@testing-library/react-hooks";
 
 describe("Menu Button", () => {
@@ -144,14 +144,39 @@ describe("Menu", () => {
       expect(handleAction1).toHaveBeenCalledTimes(1);
       expect(screen.queryByRole("menu")).not.toBeInTheDocument();
     });
+
+    test("Clicking a menuitemcheckbox toggles it and does not close the menu", async () => {
+      render(<Menu />);
+      const button = screen.getByRole("button", { name: "Open Dropdown" });
+      userEvent.tab();
+      fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
+      expect(screen.getByTestId("firstCheckbox")).not.toBeChecked();
+      const checkbox1 = screen.getByRole("menuitemcheckbox", {
+        name: "Checkbox 1",
+      });
+      userEvent.click(checkbox1);
+      expect(screen.getByTestId("firstCheckbox")).toBeChecked();
+      expect(screen.getByRole("menu")).toBeInTheDocument();
+    });
   });
 
   // https://www.w3.org/TR/wai-aria-practices-1.2/#keyboard-interaction-12
   describe("Keyboard Interaction", () => {
     describe("Enter", () => {
-      test.todo(
-        "When focus is on a menuitemcheckbox, toggles the item and closes the menu"
-      );
+      test("When focus is on a menuitemcheckbox, toggles the item and closes the menu", () => {
+        render(<Menu />);
+        const button = screen.getByRole("button", { name: "Open Dropdown" });
+        userEvent.click(button);
+        const checkbox1 = screen.getByRole("menuitemcheckbox", {
+          name: "Checkbox 1",
+        });
+        checkbox1.focus();
+        expect(screen.getByTestId("firstCheckbox")).not.toBeChecked();
+        fireEvent.keyDown(checkbox1, { key: "Enter", code: "Enter" });
+        expect(screen.getByTestId("firstCheckbox")).toBeChecked();
+        expect(screen.getByRole("menu")).toBeInTheDocument();
+      });
+
       test.todo(
         "When focus is on a menuitemradio, toggles the item and closes the menu"
       );
@@ -170,9 +195,20 @@ describe("Menu", () => {
     });
 
     describe("Space", () => {
-      test.todo(
-        "When focus is on a menuitemcheckbox, changes the state without closing the menu"
-      );
+      test("When focus is on a menuitemcheckbox, changes the state without closing the menu", () => {
+        render(<Menu />);
+        const button = screen.getByRole("button", { name: "Open Dropdown" });
+        userEvent.click(button);
+        const checkbox1 = screen.getByRole("menuitemcheckbox", {
+          name: "Checkbox 1",
+        });
+        checkbox1.focus();
+        expect(screen.getByTestId("firstCheckbox")).not.toBeChecked();
+        fireEvent.keyDown(checkbox1, { key: "Space", code: "Space" });
+        expect(screen.getByTestId("firstCheckbox")).toBeChecked();
+        expect(screen.getByRole("menu")).toBeInTheDocument();
+      });
+
       test.todo(
         "When focus is on a menuitemradio that is not checked, without closing the menu, checks the focused menuitemradio and unchecks any other checked menuitemradio element in the same group"
       );
@@ -206,6 +242,14 @@ describe("Menu", () => {
         ).toHaveFocus();
         fireEvent.keyDown(menu, { key: "ArrowDown", code: "ArrowDown" });
         expect(
+          screen.getByRole("menuitemcheckbox", { name: "Checkbox 1" })
+        ).toHaveFocus();
+        fireEvent.keyDown(menu, { key: "ArrowDown", code: "ArrowDown" });
+        expect(
+          screen.getByRole("menuitemcheckbox", { name: "X Checkbox 2" })
+        ).toHaveFocus();
+        fireEvent.keyDown(menu, { key: "ArrowDown", code: "ArrowDown" });
+        expect(
           screen.getByRole("menuitem", { name: "Action 3" })
         ).toHaveFocus();
       });
@@ -232,6 +276,14 @@ describe("Menu", () => {
         fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
         screen.getByRole("menuitem", { name: "Action 3" }).focus();
         const menu = screen.getByRole("menu");
+        fireEvent.keyDown(menu, { key: "ArrowUp", code: "ArrowUp" });
+        expect(
+          screen.getByRole("menuitemcheckbox", { name: "X Checkbox 2" })
+        ).toHaveFocus();
+        fireEvent.keyDown(menu, { key: "ArrowUp", code: "ArrowUp" });
+        expect(
+          screen.getByRole("menuitemcheckbox", { name: "Checkbox 1" })
+        ).toHaveFocus();
         fireEvent.keyDown(menu, { key: "ArrowUp", code: "ArrowUp" });
         expect(
           screen.getByRole("menuitem", { name: "Action 2" })
@@ -349,10 +401,6 @@ describe("Menu", () => {
 
   // https://www.w3.org/TR/wai-aria-practices-1.2/#wai-aria-roles-states-and-properties-13
   describe("WAI-ARIA Roles, States, and Properties", () => {
-    test.todo(
-      "The items contained in a menu are child elements of the containing menu and have any of the following roles: menuitem, menuitemcheckbox, menuitemradio"
-    );
-
     test("Each item in the menu has tabindex set to -1", () => {
       render(<Menu />);
       const button = screen.getByRole("button", { name: "Open Dropdown" });
@@ -367,9 +415,20 @@ describe("Menu", () => {
       }
     });
 
-    test.todo(
-      "When a menuitemcheckbox or menuitemradio is checked, aria-checked is set to true"
-    );
+    test("When a menuitemcheckbox is checked, aria-checked is set to true", () => {
+      render(<Menu />);
+      const button = screen.getByRole("button", { name: "Open Dropdown" });
+      userEvent.click(button);
+      const checkbox1 = screen.getByRole("menuitemcheckbox", {
+        name: "Checkbox 1",
+      });
+      checkbox1.focus();
+      expect(checkbox1).toHaveAttribute("aria-checked", "false");
+      fireEvent.keyDown(checkbox1, { key: "Enter", code: "Enter" });
+      expect(checkbox1).toHaveAttribute("aria-checked", "true");
+    });
+
+    test.todo("When a menuitemradio is checked, aria-checked is set to true");
     test.todo("When a menu item is disabled, aria-disabled is set to true.");
     test.todo(
       "All separators should have aria-orientation consistent with the separator's orientation."
