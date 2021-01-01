@@ -86,25 +86,25 @@ describe("Menu Button", () => {
     test("The element that opens the menu has role button.", () => {
       render(<Menu />);
       const button = screen.getByRole("button", { name: "Open Dropdown" });
-      expect(button.getAttribute("role")).toEqual("button");
+      expect(button).toHaveAttribute("role", "button");
     });
 
     test("The element with role button has aria-haspopup set to either menu or true.", () => {
       render(<Menu />);
       const button = screen.getByRole("button", { name: "Open Dropdown" });
-      expect(button.getAttribute("aria-haspopup")).toEqual("menu");
+      expect(button).toHaveAttribute("aria-haspopup", "menu");
     });
 
     test("When the menu is displayed, the element with role button has aria-expanded set to true. When the menu is hidden, it is recommended that aria-expanded is not present. If aria-expanded is specified when the menu is hidden, it is set to false.", () => {
       render(<Menu />);
       const button = screen.getByRole("button", { name: "Open Dropdown" });
-      expect(button.hasAttribute("aria-expanded")).toEqual(false);
+      expect(button).not.toHaveAttribute("aria-expanded");
 
       userEvent.tab();
       fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
 
       expect(screen.getByRole("menu")).toBeInTheDocument();
-      expect(button.getAttribute("aria-expanded")).toEqual("true");
+      expect(button).toHaveAttribute("aria-expanded", "true");
     });
 
     test("The element that contains the menu items displayed by activating the button has role menu.", () => {
@@ -114,13 +114,13 @@ describe("Menu Button", () => {
       userEvent.tab();
       fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
 
-      expect(screen.getByRole("menu").getAttribute("role")).toEqual("menu");
+      expect(screen.getByRole("menu")).toHaveAttribute("role", "menu");
     });
 
     test("Optionally, the element with role button has a value specified for aria-controls that refers to the element with role menu.", () => {
       render(<Menu />);
       const button = screen.getByRole("button", { name: "Open Dropdown" });
-      expect(button.getAttribute("aria-controls")).toEqual("use-menu-test");
+      expect(button).toHaveAttribute("aria-controls", "use-menu-test");
       userEvent.tab();
       fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
       expect(screen.getByRole("menu").id).toEqual("use-menu-test");
@@ -318,9 +318,17 @@ describe("Menu", () => {
     test.todo(
       "All separators should have aria-orientation consistent with the separator's orientation."
     );
-    test.todo(
-      "The menu has aria-labelledby set to a value that refers to the button that controls its display"
-    );
+
+    test("The menu has aria-labelledby set to a value that refers to the button that controls its display", () => {
+      render(<Menu />);
+      const button = screen.getByRole("button", { name: "Open Dropdown" });
+      expect(button.id).toEqual("use-menu-test-trigger");
+      userEvent.click(button);
+      expect(screen.getByRole("menu")).toHaveAttribute(
+        "aria-labelledby",
+        "use-menu-test-trigger"
+      );
+    });
   });
 });
 

@@ -13,10 +13,10 @@ import {
 
 export default function useMenu(): MenuState {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
-  const id = useMemo(
-    () => `use-menu-${process.env.NODE_ENV === "test" ? "test" : nextId++}`,
-    []
-  );
+  const [menuId, buttonId] = useMemo(() => {
+    const id = process.env.NODE_ENV === "test" ? "test" : nextId++;
+    return [`use-menu-${id}`, `use-menu-${id}-trigger`];
+  }, []);
   let itemEventHandlerIndex = 0;
   const itemEventHandlers = useRef<
     Array<[MouseEventHandler, KeyboardEventHandler, DependencyList]>
@@ -26,9 +26,10 @@ export default function useMenu(): MenuState {
     isOpen: state.isOpen,
     buttonProps: {
       role: "button",
+      id: buttonId,
       "aria-haspopup": "menu",
       "aria-expanded": state.isOpen ? "true" : undefined,
-      "aria-controls": id,
+      "aria-controls": menuId,
       onClick: useCallback(() => {
         dispatch({ type: "open" });
       }, [dispatch]),
@@ -58,7 +59,8 @@ export default function useMenu(): MenuState {
     },
     menuProps: {
       role: "menu",
-      id,
+      id: menuId,
+      "aria-labelledby": buttonId,
       ref: useCallback(
         (menu: HTMLElement | null) => {
           if (!menu) {
@@ -198,6 +200,7 @@ export interface MenuState {
 
 export interface ButtonProps {
   role: "button";
+  id: string;
   "aria-haspopup": "menu";
   "aria-expanded"?: "true";
   "aria-controls": string;
@@ -209,6 +212,7 @@ export interface ButtonProps {
 export interface MenuProps {
   role: "menu";
   id: string;
+  "aria-labelledby": string;
   ref: RefCallback<HTMLElement | null>;
   onKeyDown: KeyboardEventHandler;
   onBlur: FocusEventHandler;
