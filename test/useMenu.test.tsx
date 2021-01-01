@@ -191,13 +191,69 @@ describe("Menu", () => {
     });
 
     describe("Down Arrow", () => {
-      test.todo("When focus is in a menu, moves focus to the next item");
-      test.todo("Wraps from the last to the first menuitem");
+      test("When focus is in a menu, moves focus to the next item", () => {
+        render(<Menu />);
+        const button = screen.getByRole("button", { name: "Open Dropdown" });
+        userEvent.tab();
+        fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
+        expect(
+          screen.getByRole("menuitem", { name: "Action 1" })
+        ).toHaveFocus();
+        const menu = screen.getByRole("menu");
+        fireEvent.keyDown(menu, { key: "ArrowDown", code: "ArrowDown" });
+        expect(
+          screen.getByRole("menuitem", { name: "Action 2" })
+        ).toHaveFocus();
+        fireEvent.keyDown(menu, { key: "ArrowDown", code: "ArrowDown" });
+        expect(
+          screen.getByRole("menuitem", { name: "Action 3" })
+        ).toHaveFocus();
+      });
+
+      test("Wraps from the last to the first menuitem", () => {
+        render(<Menu />);
+        const button = screen.getByRole("button", { name: "Open Dropdown" });
+        userEvent.tab();
+        fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
+        const menu = screen.getByRole("menu");
+        screen.getByRole("menuitem", { name: "Action 3" }).focus();
+        fireEvent.keyDown(menu, { key: "ArrowDown", code: "ArrowDown" });
+        expect(
+          screen.getByRole("menuitem", { name: "Action 1" })
+        ).toHaveFocus();
+      });
     });
 
     describe("Up Arrow", () => {
-      test.todo("When focus is in a menu, moves focus to the previous item");
-      test.todo("Wraps from the first to the last menuitem");
+      test("When focus is in a menu, moves focus to the previous item", () => {
+        render(<Menu />);
+        const button = screen.getByRole("button", { name: "Open Dropdown" });
+        userEvent.tab();
+        fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
+        screen.getByRole("menuitem", { name: "Action 3" }).focus();
+        const menu = screen.getByRole("menu");
+        fireEvent.keyDown(menu, { key: "ArrowUp", code: "ArrowUp" });
+        expect(
+          screen.getByRole("menuitem", { name: "Action 2" })
+        ).toHaveFocus();
+        fireEvent.keyDown(menu, { key: "ArrowUp", code: "ArrowUp" });
+        expect(
+          screen.getByRole("menuitem", { name: "Action 1" })
+        ).toHaveFocus();
+      });
+
+      test("Wraps from the first to the last menuitem", () => {
+        render(<Menu />);
+        const button = screen.getByRole("button", { name: "Open Dropdown" });
+        userEvent.tab();
+        fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
+        screen.getByRole("menuitem", { name: "Action 1" }).focus();
+        const menu = screen.getByRole("menu");
+        fireEvent.keyDown(menu, { key: "ArrowUp", code: "ArrowUp" });
+        expect(
+          screen.getByRole("menuitem", { name: "Action 3" })
+        ).toHaveFocus();
+      });
     });
 
     describe("Escape", () => {

@@ -9,6 +9,7 @@ import {
   MouseEventHandler,
   FocusEventHandler,
   RefCallback,
+  FocusEvent,
 } from "react";
 
 export default function useMenu(): MenuState {
@@ -52,7 +53,6 @@ export default function useMenu(): MenuState {
       onBlur: useCallback(() => {
         // Close the menu, unless something inside the menu is focused
         if (state.pendingFocus === null) {
-          // console.log(document.activeElement);
           dispatch({ type: "close" });
         }
       }, [dispatch, state.pendingFocus]),
@@ -69,15 +69,13 @@ export default function useMenu(): MenuState {
 
           switch (state.pendingFocus) {
             case "first":
-              const first = menu.querySelector<HTMLElement>("[role=menuitem]");
+              const first = menu.querySelector<HTMLElement>(SELECTOR_ITEMS);
               if (first) {
                 first.focus();
               }
               break;
             case "last":
-              const items = menu.querySelectorAll<HTMLElement>(
-                "[role=menuitem]"
-              );
+              const items = menu.querySelectorAll<HTMLElement>(SELECTOR_ITEMS);
               if (items.length > 0) {
                 items[items.length - 1].focus();
               }
@@ -92,13 +90,51 @@ export default function useMenu(): MenuState {
             case "Escape":
               dispatch({ type: "close" });
               break;
+
+            case "ArrowDown":
+              {
+                const menu = e.target as HTMLElement;
+                const items = menu.querySelectorAll(SELECTOR_ITEMS);
+                for (let i = 1; i < items.length; ++i) {
+                  if (items[i - 1] === document.activeElement) {
+                    (items[i] as HTMLElement).focus();
+                    return;
+                  }
+                }
+
+                // no next sibling found, wrap around
+                (items[0] as HTMLElement).focus();
+              }
+              break;
+
+            case "ArrowUp":
+              {
+                const menu = e.target as HTMLElement;
+                const items = menu.querySelectorAll(SELECTOR_ITEMS);
+                for (let i = items.length - 2; i >= 0; --i) {
+                  if (items[i + 1] === document.activeElement) {
+                    (items[i] as HTMLElement).focus();
+                    return;
+                  }
+                }
+
+                // no previous sibling found, wrap around
+                (items[items.length - 1] as HTMLElement).focus();
+              }
+              break;
           }
         },
         [dispatch]
       ),
-      onBlur: useCallback(() => {
-        dispatch({ type: "close" });
-      }, [dispatch]),
+      onBlur: useCallback(
+        (e: FocusEvent) => {
+          const menu = e.currentTarget as HTMLElement;
+          if (!e.relatedTarget || !menu.contains(e.relatedTarget as Node)) {
+            dispatch({ type: "close" });
+          }
+        },
+        [dispatch]
+      ),
     },
 
     getItemProps(callback?: () => void, deps?: DependencyList) {
@@ -147,6 +183,9 @@ export default function useMenu(): MenuState {
     },
   };
 }
+
+const SELECTOR_ITEMS =
+  "[role=menuitem],[role=menuitemcheckbox],[role=menuitemradio]";
 
 function shallowEqual(lhs: DependencyList, rhs: DependencyList): boolean {
   if (lhs.length !== rhs.length) {
