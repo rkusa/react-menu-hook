@@ -429,7 +429,27 @@ describe("Menu", () => {
     });
 
     test.todo("When a menuitemradio is checked, aria-checked is set to true");
-    test.todo("When a menu item is disabled, aria-disabled is set to true.");
+
+    test("When a menu item is disabled, aria-disabled is set to true", () => {
+      render(<Menu />);
+      const button = screen.getByRole("button", { name: "Open Dropdown" });
+      userEvent.click(button);
+
+      const action3 = screen.getByRole("menuitem", { name: "Action 1" });
+      expect(action3).not.toHaveAttribute("aria-disabled");
+      const checkbox1 = screen.getByRole("menuitemcheckbox", {
+        name: "Checkbox 1",
+      });
+      expect(checkbox1).not.toHaveAttribute("aria-disabled");
+
+      const action1 = screen.getByRole("menuitem", { name: "Action 3" });
+      expect(action1).toHaveAttribute("aria-disabled", "true");
+      const checkbox2 = screen.getByRole("menuitemcheckbox", {
+        name: "X Checkbox 2",
+      });
+      expect(checkbox2).toHaveAttribute("aria-disabled", "true");
+    });
+
     test.todo(
       "All separators should have aria-orientation consistent with the separator's orientation."
     );
@@ -448,6 +468,60 @@ describe("Menu", () => {
 });
 
 describe("Menu item", () => {
+  describe("disabled items", () => {
+    test("clicking a disabled menuitem isn't doing anything", () => {
+      const handleAction3 = jest.fn();
+      render(<Menu onAction3={handleAction3} />);
+      const button = screen.getByRole("button", { name: "Open Dropdown" });
+      userEvent.click(button);
+      const action3 = screen.getByRole("menuitem", { name: "Action 3" });
+      userEvent.click(action3);
+      expect(handleAction3).not.toHaveBeenCalled();
+      expect(screen.getByRole("menu")).toBeInTheDocument();
+    });
+
+    test("Enter/Space on a disabled menuitem isn't doing anything", () => {
+      const handleAction3 = jest.fn();
+      render(<Menu onAction3={handleAction3} />);
+      const button = screen.getByRole("button", { name: "Open Dropdown" });
+      userEvent.click(button);
+      const action3 = screen.getByRole("menuitem", { name: "Action 3" });
+      action3.focus();
+      fireEvent.keyDown(action3, { key: " ", code: "Space" });
+      fireEvent.keyDown(action3, { key: "Enter", code: "Enter" });
+      expect(handleAction3).not.toHaveBeenCalled();
+      expect(screen.getByRole("menu")).toBeInTheDocument();
+    });
+
+    test("clicking a disabled menuitemcheckbox isn't doing anything", () => {
+      render(<Menu />);
+      const button = screen.getByRole("button", { name: "Open Dropdown" });
+      userEvent.click(button);
+      const checkbox2 = screen.getByRole("menuitemcheckbox", {
+        name: "X Checkbox 2",
+      });
+      expect(checkbox2).toHaveAttribute("aria-checked", "true");
+      userEvent.click(checkbox2);
+      expect(checkbox2).toHaveAttribute("aria-checked", "true");
+      expect(screen.getByRole("menu")).toBeInTheDocument();
+    });
+
+    test("Enter/Space on a disabled menuitem isn't doing anything", () => {
+      render(<Menu />);
+      const button = screen.getByRole("button", { name: "Open Dropdown" });
+      userEvent.click(button);
+      const checkbox2 = screen.getByRole("menuitemcheckbox", {
+        name: "X Checkbox 2",
+      });
+      expect(checkbox2).toHaveAttribute("aria-checked", "true");
+      checkbox2.focus();
+      fireEvent.keyDown(checkbox2, { key: " ", code: "Space" });
+      fireEvent.keyDown(checkbox2, { key: "Enter", code: "Enter" });
+      expect(checkbox2).toHaveAttribute("aria-checked", "true");
+      expect(screen.getByRole("menu")).toBeInTheDocument();
+    });
+  });
+
   describe("memoize onClick", () => {
     test("don't memoize if no deps list is provided", () => {
       const { result, rerender } = renderHook(() => useMenu());

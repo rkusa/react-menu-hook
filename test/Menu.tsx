@@ -35,10 +35,10 @@ export default function Menu({ onAction1, onAction2, onAction3 }: MenuProps) {
             />{" "}
             Checkbox 1
           </li>
-          <li {...getItemCheckboxProps(secondCheckbox)}>
+          <li {...getItemCheckboxProps({ ...secondCheckbox, disabled: true })}>
             {secondCheckbox.checked && "X "}Checkbox 2
           </li>
-          <li {...getItemProps(onAction3)}>Action 3</li>
+          <li {...getItemProps(onAction3, [], { disabled: true })}>Action 3</li>
         </ul>
       )}
     </div>

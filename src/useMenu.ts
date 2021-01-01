@@ -142,9 +142,16 @@ export default function useMenu(): MenuState {
       ),
     },
 
-    getItemProps(callback?: () => void, deps?: DependencyList): ItemProps {
+    getItemProps(
+      callback?: () => void,
+      deps?: DependencyList,
+      opts?: ItemOptions
+    ): ItemProps {
       const [onClick, onKeyDown] = nextMemoizedHandlers(
         () => {
+          if (opts?.disabled) {
+            return;
+          }
           callback?.();
           dispatch({ type: "close" });
         },
@@ -152,6 +159,9 @@ export default function useMenu(): MenuState {
           switch (e.code) {
             case "Enter":
             case "Space":
+              if (opts?.disabled) {
+                break;
+              }
               callback?.();
               dispatch({ type: "close" });
               break;
@@ -163,6 +173,7 @@ export default function useMenu(): MenuState {
       return {
         role: "menuitem",
         tabIndex: -1,
+        "aria-disabled": opts?.disabled ? true : undefined,
         onClick,
         onKeyDown,
       };
@@ -171,12 +182,18 @@ export default function useMenu(): MenuState {
     getItemCheckboxProps(opts: ItemCheckboxOptions): ItemCheckboxProps {
       const [onClick, onKeyDown] = nextMemoizedHandlers(
         () => {
+          if (opts.disabled) {
+            return;
+          }
           opts.onToggle();
         },
         (e: KeyboardEvent) => {
           switch (e.code) {
             case "Enter":
             case "Space":
+              if (opts.disabled) {
+                break;
+              }
               opts.onToggle();
               break;
           }
@@ -188,6 +205,7 @@ export default function useMenu(): MenuState {
         role: "menuitemcheckbox",
         tabIndex: -1,
         "aria-checked": opts.checked,
+        "aria-disabled": opts.disabled ? true : undefined,
         onClick,
         onKeyDown,
       };
@@ -281,7 +299,11 @@ export interface MenuState {
   isOpen: boolean;
   buttonProps: ButtonProps;
   menuProps: MenuProps;
-  getItemProps(callback?: () => void, deps?: DependencyList): ItemProps;
+  getItemProps(
+    callback?: () => void,
+    deps?: DependencyList,
+    opts?: ItemOptions
+  ): ItemProps;
   getItemCheckboxProps(opts: ItemCheckboxOptions): ItemCheckboxProps;
 }
 
@@ -308,12 +330,18 @@ export interface MenuProps {
 export interface ItemProps {
   role: "menuitem";
   tabIndex: -1;
+  "aria-disabled"?: true;
   onClick: MouseEventHandler;
   onKeyDown: KeyboardEventHandler;
 }
 
+export interface ItemOptions {
+  disabled?: boolean;
+}
+
 export interface ItemCheckboxOptions {
   checked: boolean;
+  disabled?: boolean;
   onToggle(): void;
 }
 
@@ -321,6 +349,7 @@ export interface ItemCheckboxProps {
   role: "menuitemcheckbox";
   tabIndex: -1;
   "aria-checked": boolean;
+  "aria-disabled"?: true;
   onClick: MouseEventHandler;
   onKeyDown: KeyboardEventHandler;
 }
