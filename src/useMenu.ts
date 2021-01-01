@@ -219,14 +219,12 @@ type Action = ActionOpen | ActionClose;
 
 const INITIAL_STATE: State = { isOpen: false, pendingFocus: null };
 
-function reducer(state: State, action: Action): State {
+function reducer(_state: State, action: Action): State {
   switch (action.type) {
     case "open":
       return { isOpen: true, pendingFocus: action.focus ?? null };
     case "close":
       return { isOpen: false, pendingFocus: null };
-    default:
-      return state;
   }
 }
 

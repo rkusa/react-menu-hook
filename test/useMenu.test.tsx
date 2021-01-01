@@ -440,6 +440,42 @@ describe("Menu item", () => {
 
       act(() => {
         result.current
+          .getItemProps(third, [2])
+          .onClick(({} as unknown) as MouseEvent);
+      });
+
+      expect(first).toHaveBeenCalledTimes(2);
+      expect(second).toHaveBeenCalledTimes(0);
+      expect(third).toHaveBeenCalledTimes(1);
+    });
+
+    test("memoize until deps length change", () => {
+      const { result, rerender } = renderHook(() => useMenu());
+      const first = jest.fn();
+      const second = jest.fn();
+      const third = jest.fn();
+
+      act(() => {
+        result.current
+          .getItemProps(first, [1])
+          .onClick(({} as unknown) as MouseEvent);
+      });
+
+      expect(first).toHaveBeenCalledTimes(1);
+      rerender();
+
+      act(() => {
+        result.current
+          .getItemProps(second, [1])
+          .onClick(({} as unknown) as MouseEvent);
+      });
+
+      expect(first).toHaveBeenCalledTimes(2);
+      expect(second).toHaveBeenCalledTimes(0);
+      rerender();
+
+      act(() => {
+        result.current
           .getItemProps(third, [1, {}])
           .onClick(({} as unknown) as MouseEvent);
       });
