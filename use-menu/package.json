@@ -2,6 +2,10 @@
   "name": "@rkusa/use-menu",
   "author": "Markus Ast",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rkusa/use-menu.git"
+  },
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
