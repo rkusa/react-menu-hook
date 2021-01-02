@@ -1,5 +1,5 @@
 {
-  "name": "use-menu-workspace",
+  "private": true,
   "workspaces": [
     "use-menu",
     "website"

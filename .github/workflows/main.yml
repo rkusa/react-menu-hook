@@ -21,17 +21,14 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Upgrade to NPM v7.x
-        run: npm install -g npm@7
-
       - name: Install deps and build (with cache)
         uses: bahmutov/npm-install@v1
 
       # - name: Lint
-      #   run: cd use-menu && npm run lint
+      #   run: cd use-menu && yarn lint
 
       - name: Test
-        run: cd use-menu && npm test --ci --coverage --maxWorkers=2
+        run: cd use-menu && yarn test --ci --coverage --maxWorkers=2
 
       - name: Build
-        run: cd use-menu && npm run build
+        run: cd use-menu && yarn build
