@@ -1,6 +1,6 @@
 import React, { ReactNode, useState, useEffect } from "react";
-import { useMenu, useMenuCheckboxState } from "use-menu/src/index";
-import { ItemCheckboxProps, ItemProps } from "use-menu/src/useMenu";
+import { useMenu, useMenuCheckboxState } from "@rkusa/use-menu/src/index";
+import { ItemCheckboxProps, ItemProps } from "@rkusa/use-menu/src/useMenu";
 
 export default function Menu() {
   const {

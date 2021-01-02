@@ -1,3 +1,3 @@
-const withTM = require("next-transpile-modules")(["use-menu"]);
+const withTM = require("next-transpile-modules")(["@rkusa/use-menu"]);
 
 module.exports = withTM({});

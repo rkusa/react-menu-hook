@@ -6,7 +6,7 @@ export default function IndexPage() {
   return (
     <>
       <Head>
-        <title>Create Next App</title>
+        <title>@rkusa/use-menu</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
