@@ -9,7 +9,7 @@ export default function Menu() {
     menuProps,
     getItemProps,
     getItemCheckboxProps,
-  } = useMenu("main", true);
+  } = useMenu("main", { defaultIsOpen: true });
   const checkbox = useMenuCheckboxState(false);
 
   return (

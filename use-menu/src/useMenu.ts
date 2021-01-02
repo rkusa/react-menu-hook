@@ -12,13 +12,17 @@ import {
   FocusEvent,
 } from "react";
 
-export default function useMenu(
-  key: string,
-  defaultIsOpen?: boolean
-): MenuState {
+export interface MenuOpts {
+  defaultIsOpen?: boolean;
+  animate?: number;
+}
+
+export default function useMenu(key: string, opts?: MenuOpts): MenuState {
   const [state, dispatch] = useReducer(
     reducer,
-    defaultIsOpen ? { ...INITIAL_STATE, isOpen: defaultIsOpen } : INITIAL_STATE
+    opts?.defaultIsOpen
+      ? { ...INITIAL_STATE, isOpen: opts?.defaultIsOpen ?? false }
+      : INITIAL_STATE
   );
   const [menuId, buttonId] = useMemo(
     () => [`use-menu-${key}`, `use-menu-${key}-trigger`],

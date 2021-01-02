@@ -20,7 +20,7 @@ export default function Menu({
     menuProps,
     getItemProps,
     getItemCheckboxProps,
-  } = useMenu("test", defaultIsOpen);
+  } = useMenu("test", { defaultIsOpen });
   const firstCheckbox = useMenuCheckboxState(false);
   const secondCheckbox = useMenuCheckboxState(true);
 
