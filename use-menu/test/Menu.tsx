@@ -2,19 +2,25 @@ import React from "react";
 import { useMenu, useMenuCheckboxState } from "../src";
 
 interface MenuProps {
+  defaultIsOpen?: boolean;
   onAction1?: () => void;
   onAction2?: () => void;
   onAction3?: () => void;
 }
 
-export default function Menu({ onAction1, onAction2, onAction3 }: MenuProps) {
+export default function Menu({
+  defaultIsOpen,
+  onAction1,
+  onAction2,
+  onAction3,
+}: MenuProps) {
   const {
     isOpen,
     buttonProps,
     menuProps,
     getItemProps,
     getItemCheckboxProps,
-  } = useMenu();
+  } = useMenu("test", defaultIsOpen);
   const firstCheckbox = useMenuCheckboxState(false);
   const secondCheckbox = useMenuCheckboxState(true);
 

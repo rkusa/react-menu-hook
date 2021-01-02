@@ -1,11 +1,23 @@
-import React from "react";
-import useMenu from "use-menu";
+import React, { ReactNode } from "react";
+import { useMenu, useMenuCheckboxState } from "use-menu/src/index";
+import { ItemCheckboxProps, ItemProps } from "use-menu/src/useMenu";
 
 export default function Menu() {
-  useMenu();
+  const {
+    isOpen,
+    buttonProps,
+    menuProps,
+    getItemProps,
+    getItemCheckboxProps,
+  } = useMenu("main", true);
+  const checkbox = useMenuCheckboxState(false);
+
   return (
     <div className="relative inline-block">
-      <button className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium">
+      <button
+        className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium"
+        {...buttonProps}
+      >
         <span>Options</span>
         <svg
           className="w-5 h-5 ml-2 -mr-1"
@@ -20,25 +32,38 @@ export default function Menu() {
         </svg>
       </button>
 
-      <div
-        role="menu"
-        className="absolute flex justify-stretch flex-col right-0 w-64 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg outline-none"
-      >
-        <button
-          type="button"
-          role="menuitem"
-          className="block px-4 py-2 text-sm text-left"
+      {isOpen && (
+        <ul
+          className="justify-stretch ul-y absolute right-0 flex flex-col w-64 origin-top-right bg-white border border-gray-200 divide-gray-100 rounded-md shadow-lg outline-none"
+          {...menuProps}
         >
-          Action 1
-        </button>
-        <button
-          type="button"
-          role="menuitem"
-          className="block px-4 py-2 text-sm text-left"
-        >
-          Action 2
-        </button>
-      </div>
+          <MenuAction {...getItemProps(() => {})}>Action 1</MenuAction>
+          <MenuAction {...getItemProps(() => {})}>Action 2</MenuAction>
+          <MenuAction {...getItemCheckboxProps(checkbox)}>
+            <input
+              type="checkbox"
+              tabIndex={-1}
+              {...checkbox.props}
+              className="mr-2"
+            />{" "}
+            Checkbox
+          </MenuAction>
+        </ul>
+      )}
     </div>
+  );
+}
+
+function MenuAction({
+  children,
+  ...props
+}: { children: ReactNode } & (ItemProps | ItemCheckboxProps)) {
+  return (
+    <li
+      className="hover:bg-gray-200 flex items-center block px-4 py-2 text-sm text-left cursor-pointer"
+      {...props}
+    >
+      {children}
+    </li>
   );
 }

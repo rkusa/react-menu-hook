@@ -12,12 +12,18 @@ import {
   FocusEvent,
 } from "react";
 
-export default function useMenu(): MenuState {
-  const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
-  const [menuId, buttonId] = useMemo(() => {
-    const id = process.env.NODE_ENV === "test" ? "test" : nextId++;
-    return [`use-menu-${id}`, `use-menu-${id}-trigger`];
-  }, []);
+export default function useMenu(
+  key: string,
+  defaultIsOpen?: boolean
+): MenuState {
+  const [state, dispatch] = useReducer(
+    reducer,
+    defaultIsOpen ? { ...INITIAL_STATE, isOpen: defaultIsOpen } : INITIAL_STATE
+  );
+  const [menuId, buttonId] = useMemo(
+    () => [`use-menu-${key}`, `use-menu-${key}-trigger`],
+    [key]
+  );
   const { nextMemoizedHandlers } = useMemoizedEventHandlers();
 
   return {
@@ -98,8 +104,12 @@ export default function useMenu(): MenuState {
 
             case "ArrowDown":
               {
-                const menu = e.target as HTMLElement;
+                const menu = e.currentTarget as HTMLElement;
                 const items = menu.querySelectorAll(SELECTOR_ITEMS);
+                if (items.length === 0) {
+                  break;
+                }
+
                 for (let i = 1; i < items.length; ++i) {
                   if (items[i - 1] === document.activeElement) {
                     (items[i] as HTMLElement).focus();
@@ -114,8 +124,12 @@ export default function useMenu(): MenuState {
 
             case "ArrowUp":
               {
-                const menu = e.target as HTMLElement;
+                const menu = e.currentTarget as HTMLElement;
                 const items = menu.querySelectorAll(SELECTOR_ITEMS);
+                if (items.length === 0) {
+                  break;
+                }
+
                 for (let i = items.length - 2; i >= 0; --i) {
                   if (items[i + 1] === document.activeElement) {
                     (items[i] as HTMLElement).focus();
@@ -227,8 +241,6 @@ function shallowEqual(lhs: DependencyList, rhs: DependencyList): boolean {
   }
   return true;
 }
-
-let nextId = 1;
 
 interface State {
   isOpen: boolean;

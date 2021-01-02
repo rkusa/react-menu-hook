@@ -1,61 +1,7 @@
 {
-  "name": "use-menu",
-  "author": "Markus Ast",
-  "version": "0.1.0",
-  "license": "MIT",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
-  "module": "dist/use-menu.esm.js",
-  "files": [
-    "dist",
-    "src"
-  ],
-  "engines": {
-    "node": ">=10"
-  },
-  "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test": "tsdx test ./test",
-    "test:watch": "tsdx test --watch ./test",
-    "lint": "tsdx lint",
-    "prepare": "tsdx build",
-    "size": "size-limit",
-    "analyze": "size-limit --why"
-  },
-  "peerDependencies": {
-    "react": ">=17"
-  },
-  "devDependencies": {
-    "@size-limit/preset-small-lib": "^4.9.1",
-    "@testing-library/jest-dom": "^5.11.6",
-    "@testing-library/react": "^11.2.2",
-    "@testing-library/react-hooks": "^3.7.0",
-    "@testing-library/user-event": "^12.5.0",
-    "@types/react": "^17.0.0",
-    "@types/react-dom": "^17.0.0",
-    "husky": "^4.3.0",
-    "jest": "^27.0.0-next.2",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "size-limit": "^4.9.1",
-    "tsdx": "^0.14.1",
-    "tslib": "^2.0.3",
-    "typescript": "^4.1.2"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint"
-    }
-  },
-  "size-limit": [
-    {
-      "path": "dist/use-menu.cjs.production.min.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/use-menu.esm.js",
-      "limit": "10 KB"
-    }
+  "name": "use-menu-workspace",
+  "workspaces": [
+    "use-menu",
+    "website"
   ]
 }

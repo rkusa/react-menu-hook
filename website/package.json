@@ -11,16 +11,18 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "next": "10.0.3",
-    "react": "17.0.1",
-    "react-dom": "17.0.1",
+    "next": "^10.0.3",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
     "tailwindcss": "^2.0.1",
-    "use-menu": "../"
+    "use-menu": "../use-menu"
   },
   "devDependencies": {
     "@types/node": "^14.14.10",
     "@types/react": "^17.0.0",
     "autoprefixer": "^10.0.4",
-    "postcss": "^8.1.14"
+    "next-transpile-modules": "^6.0.0",
+    "postcss": "^8.1.14",
+    "prettier-plugin-tailwind-css": "^1.4.0"
   }
 }

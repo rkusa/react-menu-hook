@@ -132,6 +132,11 @@ describe("Menu Button", () => {
 // The following tests ignore everything related to horizontal menus and submenus, it only assums
 // vertical one-level menus (for now).
 describe("Menu", () => {
+  test("default isOpen", () => {
+    render(<Menu defaultIsOpen />);
+    expect(screen.getByRole("menu")).toBeInTheDocument();
+  });
+
   describe("Mouse Interaction", () => {
     test("Clicking a menuitem activates it and closes the menu", async () => {
       const handleAction1 = jest.fn();
@@ -524,7 +529,7 @@ describe("Menu item", () => {
 
   describe("memoize onClick", () => {
     test("don't memoize if no deps list is provided", () => {
-      const { result, rerender } = renderHook(() => useMenu());
+      const { result, rerender } = renderHook(() => useMenu("test"));
       const first = jest.fn();
       const second = jest.fn();
 
@@ -547,7 +552,7 @@ describe("Menu item", () => {
     });
 
     test("memoize until deps change", () => {
-      const { result, rerender } = renderHook(() => useMenu());
+      const { result, rerender } = renderHook(() => useMenu("test"));
       const first = jest.fn();
       const second = jest.fn();
       const third = jest.fn();
@@ -583,7 +588,7 @@ describe("Menu item", () => {
     });
 
     test("memoize until deps length change", () => {
-      const { result, rerender } = renderHook(() => useMenu());
+      const { result, rerender } = renderHook(() => useMenu("test"));
       const first = jest.fn();
       const second = jest.fn();
       const third = jest.fn();
@@ -619,7 +624,7 @@ describe("Menu item", () => {
     });
 
     test("memoize for multiple menu items", () => {
-      const { result, rerender } = renderHook(() => useMenu());
+      const { result, rerender } = renderHook(() => useMenu("test"));
       const first = jest.fn();
       const second = jest.fn();
 
