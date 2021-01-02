@@ -1,7 +1,3 @@
-// WAI-ARIA:
-// https://www.w3.org/TR/wai-aria-practices-1.2/#menu
-// https://www.w3.org/TR/wai-aria-practices-1.2/#menubutton
-
 import React, { MouseEvent } from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import Menu from "./Menu";
@@ -9,6 +5,10 @@ import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { useMenu } from "../src";
 import { renderHook, act } from "@testing-library/react-hooks";
+
+// WAI-ARIA:
+// https://www.w3.org/TR/wai-aria-practices-1.2/#menu
+// https://www.w3.org/TR/wai-aria-practices-1.2/#menubutton
 
 describe("Menu Button", () => {
   test("focus menu button", () => {

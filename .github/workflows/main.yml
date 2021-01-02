@@ -24,11 +24,11 @@ jobs:
       - name: Install deps and build (with cache)
         uses: bahmutov/npm-install@v1
 
-      - name: Lint
-        run: cd use-menu && yarn lint
+      # - name: Lint
+      #   run: cd use-menu && npm run lint
 
       - name: Test
-        run: cd use-menu && yarn test --ci --coverage --maxWorkers=2
+        run: cd use-menu && npm test --ci --coverage --maxWorkers=2
 
       - name: Build
-        run: cd use-menu && yarn build
+        run: cd use-menu && npm run build
