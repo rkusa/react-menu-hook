@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState, useEffect } from "react";
 import { useMenu, useMenuCheckboxState } from "use-menu/src/index";
 import { ItemCheckboxProps, ItemProps } from "use-menu/src/useMenu";
 
@@ -11,6 +11,14 @@ export default function Menu() {
     getItemCheckboxProps,
   } = useMenu("main", { defaultIsOpen: true });
   const checkbox = useMenuCheckboxState(false);
+
+  const [showMenu, className] = useTransition(isOpen, {
+    duration: 100,
+    entering: "transition ease-out duration-100 transform opacity-0 scale-95",
+    entered: "transition ease-out duration-100 transform opacity-100 scale-100",
+    exiting: "transition ease-in duration-75 transform opacity-100 scale-100",
+    exited: "transition ease-in duration-75 transform opacity-0 scale-95",
+  });
 
   return (
     <div className="relative inline-block">
@@ -32,9 +40,9 @@ export default function Menu() {
         </svg>
       </button>
 
-      {isOpen && (
+      {showMenu && (
         <ul
-          className="justify-stretch ul-y absolute right-0 flex flex-col w-64 origin-top-right bg-white border border-gray-200 divide-gray-100 rounded-md shadow-lg outline-none"
+          className={`justify-stretch ul-y absolute right-0 flex flex-col w-64 origin-top-right bg-white border border-gray-200 divide-gray-100 rounded-md shadow-lg outline-none ${className}`}
           {...menuProps}
         >
           <MenuAction {...getItemProps(() => {})}>Action 1</MenuAction>
@@ -66,4 +74,49 @@ function MenuAction({
       {children}
     </li>
   );
+}
+
+interface UseTransitionOpts {
+  duration?: number;
+  entering?: string;
+  entered?: string;
+  exiting?: string;
+  exited?: string;
+}
+
+function useTransition(
+  actualState: boolean,
+  opts: UseTransitionOpts
+): [boolean, string] {
+  const [state, setState] = useState(actualState);
+  const [className, setClassName] = useState<string | undefined>(() =>
+    actualState ? opts.entered : undefined
+  );
+
+  useEffect(
+    () => {
+      // entering
+      if (!state && actualState) {
+        setState(true);
+        setClassName(opts.entering);
+      }
+      // entered
+      else if (state && actualState) {
+        setTimeout(() => setClassName(opts.entered));
+      }
+      // exiting, exited
+      else if (state && !actualState) {
+        setClassName(opts.exiting);
+        setTimeout(() => setClassName(opts.exited));
+        const timeout = setTimeout(() => {
+          setState(false);
+        }, opts.duration ?? 200);
+        return () => clearTimeout(timeout);
+      }
+    },
+    // `opts` not part of the deps on purpose
+    [state, actualState]
+  );
+
+  return [state, className ?? ""];
 }
