@@ -12,22 +12,37 @@ import {
   FocusEvent,
 } from "react";
 
+/**
+ * Options of the {@link useMenu} hook.
+ */
 export interface MenuOpts {
+  /**
+   * Whether the menu is already opened initially.
+   */
   defaultIsOpen?: boolean;
-  animate?: number;
 }
 
+/**
+ * Create everything necessary to construct an accessible menu (or dropdown).
+ * @param key - a key that uniquely identifies the menu on the current page
+ * @param opts - options to further customize the menu's behavior
+ */
 export default function useMenu(key: string, opts?: MenuOpts): MenuState {
+  // The main internal state of the menu
   const [state, dispatch] = useReducer(
     reducer,
     opts?.defaultIsOpen
       ? { ...INITIAL_STATE, isOpen: opts?.defaultIsOpen ?? false }
       : INITIAL_STATE
   );
+
+  // Create IDs for the menu and menu button
   const [menuId, buttonId] = useMemo(
     () => [`use-menu-${key}`, `use-menu-${key}-trigger`],
     [key]
   );
+
+  // Initialize a helper to memoize event handlers of all menu items
   const { nextMemoizedHandlers } = useMemoizedEventHandlers();
 
   return {
@@ -231,12 +246,19 @@ export default function useMenu(key: string, opts?: MenuOpts): MenuState {
   };
 }
 
+/**
+ * A selector for all possible menu item types.
+ */
 const SELECTOR_ITEMS =
   "[role=menuitem],[role=menuitemcheckbox],[role=menuitemradio]";
 
+/**
+ * Determine whether two dependency lists are shallowly equal or not.
+ */
 function shallowEqual(lhs: DependencyList, rhs: DependencyList): boolean {
   if (lhs.length !== rhs.length) {
-    return false;
+  // If they have a different length, they are definitely not shallowly equal.
+  return false;
   }
   for (let i = 0; i < lhs.length; ++i) {
     if (lhs[i] !== rhs[i]) {
@@ -246,44 +268,89 @@ function shallowEqual(lhs: DependencyList, rhs: DependencyList): boolean {
   return true;
 }
 
+/**
+ * The internal state of the menu.
+ */
 interface State {
+  /**
+   * Whether the menu is open or not.
+   */
   isOpen: boolean;
+
+  /**
+   * Whether the menu should focus its first or last item once it is opened.
+   */
   pendingFocus: "first" | "last" | null;
 }
 
+/**
+ * The open action for the {@link reducer}.
+ */
 interface ActionOpen {
   type: "open";
   focus?: "first" | "last";
 }
 
+/**
+ * The close action for the {@link reducer}.
+ */
 interface ActionClose {
   type: "close";
 }
 
-type Action = ActionOpen | ActionClose;
-
+/**
+ * The initial internal state of the menu.
+ */
 const INITIAL_STATE: State = { isOpen: false, pendingFocus: null };
 
-function reducer(state: State, action: Action): State {
+/**
+ * The reducer used to execute state changes.
+ * @param state - the current state
+ * @param action - the action applied on the current state
+ */
+function reducer(state: State, action: ActionOpen | ActionClose): State {
   switch (action.type) {
     case "open":
+      // The open action acts like a toogle, if the menu is already open, it is closed
       if (!state.isOpen) {
         return { isOpen: true, pendingFocus: action.focus ?? null };
       } else {
         return { isOpen: false, pendingFocus: null };
       }
+
     case "close":
       return { isOpen: false, pendingFocus: null };
   }
 }
 
+/**
+ * Memoize event handlers for an arbitrary length of menu items.
+ */
 function useMemoizedEventHandlers() {
+  // The index of the next menu item. This is increased each time a set of event handlers is
+  // memoized.
   let itemEventHandlerIndex = 0;
+
+  // The array of memoized event handlers and their dependency list (which determines whether the
+  // handlers have changed or not).
   const itemEventHandlers = useRef<
     Array<[MouseEventHandler, KeyboardEventHandler, DependencyList]>
   >([]);
 
   return {
+    /**
+     * Get the next set of memoized event handlers (or update them if necessary).
+     *
+     * @param defaultOnClick - the default `onClick` handler, which is used if there is no memoized
+     *    handler, or if the dependencies have changed
+     * @param defaultOnKeyDown - the default `onKeyDown` handler, which is used if there is no
+     *    memoized handler, or if the dependencies have changed
+     * @param deps - the dependencies which are used to determine whether the handlers should be
+     *    updated or not
+     *
+     * @returns a pair of event handlers, where the first one is the `onClick` and the second one
+     *  is the `onKeyDown` handler
+     */
     nextMemoizedHandlers(
       defaultOnClick: MouseEventHandler,
       defaultOnKeyDown: KeyboardEventHandler,
@@ -292,6 +359,7 @@ function useMemoizedEventHandlers() {
       const memorized = itemEventHandlers.current[itemEventHandlerIndex];
       let onClick, onKeyDown;
 
+      // Update the memoized handlers if the dependencies have changed
       if (memorized && deps) {
         const [previousOnClick, previousOnKeyDown, previousDeps] = memorized;
         if (shallowEqual(deps, previousDeps)) {
@@ -300,14 +368,19 @@ function useMemoizedEventHandlers() {
         }
       }
 
+      // Always update the handlers if no dependencies are provided
       onClick = onClick ?? defaultOnClick;
       onKeyDown = onKeyDown ?? defaultOnKeyDown;
 
+      // Memoized the updated event handlers
       itemEventHandlers.current[itemEventHandlerIndex] = [
         onClick,
         onKeyDown,
         deps ? deps.slice() : [],
       ];
+
+      // Increase the index so that the handlers for the next menu item are returned when
+      // `nextMemoizedHandlers` is called again
       itemEventHandlerIndex++;
 
       return [onClick, onKeyDown];
@@ -315,18 +388,74 @@ function useMemoizedEventHandlers() {
   };
 }
 
+/**
+ * All properties and event handlers necessary to construct an accessible menu.
+ */
 export interface MenuState {
+  /**
+   * Whether the menu is currently open or not.
+   * @example
+   * ```
+   * {isOpen ? <div {...menuProps}>...</div>}
+   * ```
+   */
   isOpen: boolean;
+
+  /**
+   * The properties and event handlers for the button that opens and closes the menu.
+   * @example
+   * ```
+   * <button {...buttonProps}>Open Menu</button>
+   * ```
+   */
   buttonProps: ButtonProps;
+
+  /**
+   * The properties and event handlers for the menu.
+   * @example
+   * ```
+   * {isOpen ? <div {...menuProps}>...</div>}
+   * ```
+   */
   menuProps: MenuProps;
+
+  /**
+   * Get the properties and event handlers for the next menu item. Each call to this function refers
+   * to one menu item.
+   * @example
+   * ```
+   * <li {...getItemProps(() => {})}>Menu Action</li>
+   * ```
+   *
+   * @param callback - the callback that is executed if the menu action is activated
+   * @param deps - the optional dependencies that determine whether `callback` changed
+   * @param opts - additional options for the menu item
+   */
   getItemProps(
     callback?: () => void,
     deps?: DependencyList,
     opts?: ItemOptions
   ): ItemProps;
+
+  /**
+   * Get the properties and event handlers for the next checkbox menu item. Each call to this
+   * function refers to one checkbox menu item.
+   * @example
+   * ```
+   * const checkbox = useMenuCheckboxState(false);
+   * <li {...getItemCheckboxProps(const)}>
+   *   <input type="checkbox" tabIndex={-1} {...checkbox.props} /> Checkbox
+   * </li>
+   * ```
+   *
+   * @param opts - options for the checkbox menu item
+   */
   getItemCheckboxProps(opts: ItemCheckboxOptions): ItemCheckboxProps;
 }
 
+/**
+ * The properties and event handlers for the button that opens and closes the menu.
+ */
 export interface ButtonProps {
   role: "button";
   id: string;
@@ -338,6 +467,9 @@ export interface ButtonProps {
   onBlur: FocusEventHandler;
 }
 
+/**
+ * The properties and event handlers for the menu.
+ */
 export interface MenuProps {
   role: "menu";
   id: string;
@@ -347,6 +479,9 @@ export interface MenuProps {
   onBlur: FocusEventHandler;
 }
 
+/**
+ * The properties and event handlers for a menu item.
+ */
 export interface ItemProps {
   role: "menuitem";
   tabIndex: -1;
@@ -355,16 +490,39 @@ export interface ItemProps {
   onKeyDown: KeyboardEventHandler;
 }
 
+/**
+ * Additional options for a menu item.
+ */
 export interface ItemOptions {
+  /**
+   * Whether the menu item is disabled.
+   */
   disabled?: boolean;
 }
 
+/**
+ * The options for a checkbox menu item.
+ */
 export interface ItemCheckboxOptions {
+  /**
+   * Whether the checkbox is checked.
+   */
   checked: boolean;
+
+  /**
+   * Whether the checkbox menu item is disabled.
+   */
   disabled?: boolean;
+
+  /**
+   * A function to toggle the checkbox on and off.
+   */
   onToggle(): void;
 }
 
+/**
+ * The properties and event handlers for a checkbox menu item.
+ */
 export interface ItemCheckboxProps {
   role: "menuitemcheckbox";
   tabIndex: -1;

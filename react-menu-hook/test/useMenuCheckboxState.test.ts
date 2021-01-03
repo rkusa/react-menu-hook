@@ -1,4 +1,5 @@
 import { renderHook, act } from "@testing-library/react-hooks";
+import { FormEvent } from "react";
 import { useMenuCheckboxState } from "../src";
 
 describe("useMenuCheckboxState", () => {
@@ -56,9 +57,17 @@ describe("useMenuCheckboxState", () => {
   test("props.onChange() updates the state based on event target.checked", () => {
     const { result } = renderHook(() => useMenuCheckboxState(true));
     expect(result.current.checked).toEqual(true);
-    act(() => result.current.props.onChange({ target: { checked: false } }));
+    act(() =>
+      result.current.props.onChange({
+        target: ({ checked: false } as unknown) as EventTarget,
+      } as FormEvent)
+    );
     expect(result.current.checked).toEqual(false);
-    act(() => result.current.props.onChange({ target: { checked: true } }));
+    act(() =>
+      result.current.props.onChange({
+        target: ({ checked: true } as unknown) as EventTarget,
+      } as FormEvent)
+    );
     expect(result.current.checked).toEqual(true);
   });
 });
