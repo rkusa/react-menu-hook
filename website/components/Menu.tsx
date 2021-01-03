@@ -1,9 +1,7 @@
 import React, { ReactNode, useState, useEffect } from "react";
 import { useMenu, useMenuCheckboxState } from "react-menu-hook/src/index";
-import {
-  ItemCheckboxProps,
-  ItemProps,
-} from "react-menu-hook/src/useMenu";
+import { ItemCheckboxProps, ItemProps } from "react-menu-hook/src/useMenu";
+import { useTransition } from "react-css-transition-hook";
 
 export default function Menu() {
   const {
@@ -77,49 +75,4 @@ function MenuAction({
       {children}
     </li>
   );
-}
-
-interface UseTransitionOpts {
-  duration?: number;
-  entering?: string;
-  entered?: string;
-  exiting?: string;
-  exited?: string;
-}
-
-function useTransition(
-  actualState: boolean,
-  opts: UseTransitionOpts
-): [boolean, string] {
-  const [state, setState] = useState(actualState);
-  const [className, setClassName] = useState<string | undefined>(() =>
-    actualState ? opts.entered : undefined
-  );
-
-  useEffect(
-    () => {
-      // entering
-      if (!state && actualState) {
-        setState(true);
-        setClassName(opts.entering);
-      }
-      // entered
-      else if (state && actualState) {
-        setTimeout(() => setClassName(opts.entered));
-      }
-      // exiting, exited
-      else if (state && !actualState) {
-        setClassName(opts.exiting);
-        setTimeout(() => setClassName(opts.exited));
-        const timeout = setTimeout(() => {
-          setState(false);
-        }, opts.duration ?? 200);
-        return () => clearTimeout(timeout);
-      }
-    },
-    // `opts` not part of the deps on purpose
-    [state, actualState]
-  );
-
-  return [state, className ?? ""];
 }

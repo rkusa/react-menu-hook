@@ -9049,6 +9049,11 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-css-transition-hook@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/react-css-transition-hook/-/react-css-transition-hook-1.0.0.tgz#152a8d4b4840f046a3bc5f79def40b50ca71ac6c"
+  integrity sha512-XO8axBmMbwoQ9baCd53E0bi+8bubrEziQFKom4G21813LjaSaOGHDYYYPYm2c8j7LtwjYjlACBFdpPvofbAs4g==
+
 react-dom@^17.0.1:
   version "17.0.1"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-17.0.1.tgz#1de2560474ec9f0e334285662ede52dbc5426fc6"
