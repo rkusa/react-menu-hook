@@ -1,6 +1,7 @@
 .*
 !.gitignore
 !.github
+!.gitkeep
 node_modules
 dist
 coverage

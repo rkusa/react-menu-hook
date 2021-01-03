@@ -1,9 +1,9 @@
 import React, { ReactNode, useState, useEffect } from "react";
-import { useMenu, useMenuCheckboxState } from "../../react-menu-hook/src/index";
+import { useMenu, useMenuCheckboxState } from "react-menu-hook/src/index";
 import {
   ItemCheckboxProps,
   ItemProps,
-} from "../../react-menu-hook/src/useMenu";
+} from "react-menu-hook/src/useMenu";
 
 export default function Menu() {
   const {
