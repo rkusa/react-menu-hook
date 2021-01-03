@@ -1,15 +1,24 @@
 {
-  "name": "@rkusa/use-menu",
+  "name": "react-menu-hook",
   "author": "Markus Ast",
   "version": "0.1.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rkusa/use-menu.git"
+    "url": "git+https://github.com/rkusa/react-menu-hook.git"
   },
   "license": "MIT",
+  "description": "Minimal, zero-dependency React hook to create accessible menus (aka. dropdowns).",
+  "keywords": [
+    "react",
+    "hook",
+    "react hook",
+    "menu",
+    "dropdown",
+    "a11y"
+  ],
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "module": "dist/use-menu.esm.js",
+  "module": "dist/react-menu-hook.esm.js",
   "files": [
     "dist",
     "src"
@@ -25,7 +34,8 @@
     "lint": "tsdx lint",
     "prepare": "tsdx build",
     "size": "size-limit",
-    "analyze": "size-limit --why"
+    "analyze": "size-limit --why",
+    "type-check": "tsc --noEmit"
   },
   "peerDependencies": {
     "react": ">=17"
@@ -55,11 +65,11 @@
   },
   "size-limit": [
     {
-      "path": "dist/use-menu.cjs.production.min.js",
+      "path": "dist/react-menu-hook.cjs.production.min.js",
       "limit": "10 KB"
     },
     {
-      "path": "dist/use-menu.esm.js",
+      "path": "dist/react-menu-hook.esm.js",
       "limit": "10 KB"
     }
   ]

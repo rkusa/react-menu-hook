@@ -1,7 +1,11 @@
 {
   "private": true,
   "workspaces": [
-    "use-menu",
+    "react-menu-hook",
     "website"
-  ]
+  ],
+  "scripts": {
+    "test": "cd react-menu-hook && yarn test",
+    "type-check": "cd react-menu-hook && yarn type-check && cd ../website && yarn type-check"
+  }
 }

@@ -25,10 +25,13 @@ jobs:
         uses: bahmutov/npm-install@v1
 
       # - name: Lint
-      #   run: cd use-menu && yarn lint
+      #   run: cd react-menu-hook && yarn lint
 
       - name: Test
-        run: cd use-menu && yarn test --ci --coverage --maxWorkers=2
+        run: cd react-menu-hook && yarn test --ci --coverage --maxWorkers=2
+
+      - name: Type Check
+        run: yarn type-check
 
       - name: Build
-        run: cd use-menu && yarn build
+        run: cd react-menu-hook && yarn build

@@ -1,15 +1,15 @@
-# use-menu
+# React Menu Hook
 
-Minimal, zero-dependency React hook to create accessible menus (aka dropdowns).
+Minimal, zero-dependency React hook to create accessible menus (aka. dropdowns).
 
-[Demo](https://use-menu.vercel.app) | [NPM](http://npmjs.com/package/@rkusa/use-menu)
+[Demo](https://react-menu-hook.vercel.app) | [NPM](http://npmjs.com/package/react-menu-hook)
 
 ## Example
 
 Minimal example:
 
 ```tsx
-import { useMenu } from "@rkusa/use-menu";
+import { useMenu } from "react-menu-hook";
 
 export default function Menu() {
   const { isOpen, buttonProps, menuProps, getItemProps } = useMenu("main");
@@ -22,6 +22,7 @@ export default function Menu() {
         <ul {...menuProps}>
           <li {...getItemProps(() => {})}>Action 1</li>
           <li {...getItemProps(() => {})}>Action 2</li>
+        </ul>
       )}
     </div>
   );
@@ -31,7 +32,7 @@ export default function Menu() {
 More advanced examples:
 
 - [website/components/Menu.tsx](website/components/Menu.tsx)
-- [use-menu/test/Menu.tsx](use-menu/test/Menu.tsx)
+- [react-menu-hook/test/Menu.tsx](react-menu-hook/test/Menu.tsx)
 
 ## License
 

@@ -6,7 +6,7 @@ export default function IndexPage() {
   return (
     <>
       <Head>
-        <title>@rkusa/use-menu</title>
+        <title>react-menu-hook</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

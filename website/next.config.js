@@ -1,4 +1,4 @@
-const withTM = require("next-transpile-modules")(["@rkusa/use-menu"]);
+const withTM = require("next-transpile-modules")(["react-menu-hook"]);
 
 module.exports = withTM({
   target: 'serverless'

@@ -1,5 +1,5 @@
 {
-  "name": "use-menu-website",
+  "name": "react-menu-hook-website",
   "private": true,
   "version": "1.0.0",
   "description": "",
@@ -13,10 +13,10 @@
   },
   "dependencies": {
     "next": "^10.0.3",
-    "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "tailwindcss": "^2.0.1",
-    "@rkusa/use-menu": "0.1.0"
+    "react-menu-hook": "0.1.0",
+    "react": "^17.0.1",
+    "tailwindcss": "^2.0.1"
   },
   "devDependencies": {
     "@types/node": "^14.14.10",
