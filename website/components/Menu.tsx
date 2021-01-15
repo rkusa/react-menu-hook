@@ -13,8 +13,8 @@ export default function Menu() {
   } = useMenu("main", { defaultIsOpen: true });
   const checkbox = useMenuCheckboxState(false);
 
-  const [showMenu, className] = useTransition(isOpen, {
-    duration: 100,
+  const [showMenu, { className, ...props }] = useTransition(isOpen, {
+    disableInitialEnterTransition: true,
     entering: "transition ease-out duration-100 transform opacity-0 scale-95",
     entered: "transition ease-out duration-100 transform opacity-100 scale-100",
     exiting: "transition ease-in duration-75 transform opacity-100 scale-100",
@@ -45,6 +45,7 @@ export default function Menu() {
         <ul
           className={`justify-stretch ul-y absolute right-0 flex flex-col w-64 origin-top-right bg-white border border-gray-200 divide-gray-100 rounded-md shadow-lg outline-none ${className}`}
           {...menuProps}
+          {...props}
         >
           <MenuAction {...getItemProps(() => {})}>Action 1</MenuAction>
           <MenuAction {...getItemProps(() => {})}>Action 2</MenuAction>

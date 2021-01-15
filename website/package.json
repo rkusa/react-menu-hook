@@ -13,9 +13,9 @@
   },
   "dependencies": {
     "next": "^10.0.3",
-    "react-css-transition-hook": "1.0.0",
+    "react-css-transition-hook": "^2.0.0",
     "react-dom": "^17.0.1",
-    "react-menu-hook": "1.0.0",
+    "react-menu-hook": "^1.0.0",
     "react": "^17.0.1",
     "tailwindcss": "^2.0.1"
   },
