@@ -37,6 +37,9 @@
     "analyze": "size-limit --why",
     "type-check": "tsc --noEmit"
   },
+  "resolutions": {
+    "**/prettier": "^2.2.1"
+  },
   "peerDependencies": {
     "react": ">=17"
   },

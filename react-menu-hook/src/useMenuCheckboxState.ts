@@ -21,12 +21,12 @@ export interface CheckboxState {
   /**
    * Whether the checkbox is checked or not.
    */
-  checked: boolean
+  checked: boolean;
 
   /**
    * Toggle the checkbox's state (either from `true` to `false`, or from `false` to `true`).
    */
-  onToggle(): void
+  onToggle(): void;
 
   /**
    * Properties meant to be destructed into a checkbox input.
@@ -43,7 +43,7 @@ export interface CheckboxState {
      * This is the same as the parent `checked`, but part of the `props` property to make it easier
      * to destruct it into an actual input.
      */
-    checked: boolean
-    onChange: FormEventHandler
-  }
+    checked: boolean;
+    onChange: FormEventHandler;
+  };
 }

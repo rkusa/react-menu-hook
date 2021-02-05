@@ -1,4 +1,4 @@
-import React, { ReactNode, useState, useEffect } from "react";
+import React, { ReactNode } from "react";
 import { useMenu, useMenuCheckboxState } from "react-menu-hook/src/index";
 import { ItemCheckboxProps, ItemProps } from "react-menu-hook/src/useMenu";
 import { useTransition } from "react-css-transition-hook";
@@ -70,7 +70,7 @@ function MenuAction({
 }: { children: ReactNode } & (ItemProps | ItemCheckboxProps)) {
   return (
     <li
-      className="hover:bg-gray-200 flex items-center block px-4 py-2 text-sm text-left cursor-pointer"
+      className="hover:bg-gray-200 flex items-center px-4 py-2 text-sm text-left cursor-pointer"
       {...props}
     >
       {children}

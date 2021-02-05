@@ -257,8 +257,8 @@ const SELECTOR_ITEMS =
  */
 function shallowEqual(lhs: DependencyList, rhs: DependencyList): boolean {
   if (lhs.length !== rhs.length) {
-  // If they have a different length, they are definitely not shallowly equal.
-  return false;
+    // If they have a different length, they are definitely not shallowly equal.
+    return false;
   }
   for (let i = 0; i < lhs.length; ++i) {
     if (lhs[i] !== rhs[i]) {
