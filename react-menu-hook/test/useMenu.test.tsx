@@ -1,4 +1,10 @@
-import React, { MouseEvent } from "react";
+import React, {
+  Children,
+  cloneElement,
+  isValidElement,
+  MouseEvent,
+  ReactNode,
+} from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import Menu from "./Menu";
 import "@testing-library/jest-dom";
@@ -650,6 +656,46 @@ describe("Menu item", () => {
 
       expect(first).toHaveBeenCalledTimes(2);
       expect(second).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe("patched actions", () => {
+    function MenuPatched({ children }: { children?: ReactNode }) {
+      const { isOpen, buttonProps, menuProps, getItemProps } = useMenu("test");
+
+      return (
+        <div>
+          <button {...buttonProps}>Open Dropdown</button>
+
+          {isOpen && (
+            <ul {...menuProps}>
+              {Children.map(children, (child) =>
+                isValidElement(child)
+                  ? cloneElement(child, getItemProps())
+                  : child
+              )}
+            </ul>
+          )}
+        </div>
+      );
+    }
+
+    it("should not overwrite click handlers of children", () => {
+      const handleAction1 = jest.fn();
+      render(
+        <MenuPatched>
+          <button type="button" onClick={handleAction1}>
+            Action 1
+          </button>
+        </MenuPatched>
+      );
+      const button = screen.getByRole("button", { name: "Open Dropdown" });
+      userEvent.tab();
+      fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
+      const action1 = screen.getByRole("menuitem", { name: "Action 1" });
+      userEvent.click(action1);
+      expect(handleAction1).toHaveBeenCalledTimes(1);
+      expect(screen.queryByRole("menu")).not.toBeInTheDocument();
     });
   });
 });

@@ -9,6 +9,6 @@
     "type-check": "cd react-menu-hook && yarn type-check && cd ../website && yarn type-check"
   },
   "resolutions": {
-    "**/prettier": "^2.2.1"
+    "**/prettier": "^2.7.0"
   }
 }
